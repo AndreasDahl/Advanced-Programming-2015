@@ -60,6 +60,8 @@ height :: Curve -> Double
 height c = abs((pointY pa) - (pointY pb))
     where (pa, pb) = (bbox c)
 
+toList :: Curve -> [Point]
+toList (Curve ps) = ps
 
 
 cur = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
