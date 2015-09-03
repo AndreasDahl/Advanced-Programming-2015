@@ -19,7 +19,7 @@ instance Eq Point where
         abs(xa - xb) < 0.01 && abs(ya - yb) < 0.01
 
 data Curve = Curve [Point]
-    deriving (Show)
+    deriving (Show, Eq)
 
 curve :: Point -> [Point] -> Curve
 curve p ps = Curve (p:ps)
@@ -110,3 +110,4 @@ unitTests _ = doTest(pointX(point(3.0,6.0)) == 3.0, 1) ++
         doTest (b, n) = if not(b) then (printf "Error at test %d\n" n) else (printf "")
         c1 = curve (Point(1.0,0.0)) [(Point(2.0,0.0))]
         c2 = curve (Point(1.0,1.0)) [(Point(2.0,2.0))]
+
