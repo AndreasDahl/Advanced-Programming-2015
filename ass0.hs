@@ -90,3 +90,23 @@ hilbert c = c0 `connect` c1 `connect` c2 `connect` c3
           c1 = c `translate` point (w+p+w, h)
           c2 = c
           c3 = ch `rotate` 90 `translate` point (0, h+p)
+
+{- Do them tests!! -}
+unitTests :: Int -> String
+unitTests _ = doTest(pointX(point(3.0,6.0)) == 3.0, 1) ++
+              doTest(pointY(point(3.0,6.0)) == 6.0, 2) ++
+              doTest(head(toList(rotate(c1)  90)) == (point( 0.0,  1.0)), 3) ++
+              doTest(head(toList(rotate(c1) 180)) == (point(-1.0,  0.0)), 4) ++
+              doTest(head(toList(rotate(c1) 270)) == (point( 0.0, -1.0)), 5) ++
+              doTest(head(tail(toList(rotate(c1)  90))) == (point( 0.0,  2.0)), 6) ++
+              doTest(head(tail(toList(rotate(c1) 180))) == (point(-2.0,  0.0)), 7) ++
+              doTest(head(tail(toList(rotate(c1) 270))) == (point( 0.0, -2.0)), 8) ++
+              doTest(head(toList(rotate(c2)  90)) == (point(-1.0,  1.0)),  9) ++
+              doTest(head(toList(rotate(c2) 180)) == (point(-1.0, -1.0)), 10) ++
+              doTest(head(toList(rotate(c2) 270)) == (point( 1.0, -1.0)), 11) ++
+              doTest(head(toList(reflect c2 (Vertical 0)) == (point(-1.0, 1.0))), 12) 
+    where
+        doTest :: (Bool, Int) -> String
+        doTest (b, n) = if not(b) then (printf "Error at test %d\n" n) else (printf "")
+        c1 = curve (Point(1.0,0.0)) [(Point(2.0,0.0))]
+        c2 = curve (Point(1.0,1.0)) [(Point(2.0,2.0))]
