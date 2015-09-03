@@ -52,7 +52,6 @@ bbox :: Curve -> (Point, Point)
 bbox (Curve ps) = (Point (minimum (map pointX ps), minimum (map pointY ps)),
                    Point (maximum (map pointX ps), maximum (map pointY ps)))
         
+toList :: Curve -> [Point]
+toList (Curve ps) = ps
 
-
-
-c = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
