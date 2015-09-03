@@ -19,7 +19,7 @@ instance Eq Point where
         abs(xa - xb) < 0.01 && abs(ya - yb) < 0.01
 
 data Curve = Curve [Point]
-    deriving (Show)
+    deriving (Show, Eq)
 
 curve :: Point -> [Point] -> Curve
 curve p ps = Curve (p:ps)
