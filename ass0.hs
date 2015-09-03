@@ -27,16 +27,26 @@ connect :: Curve -> Curve -> Curve
 connect (Curve a as) (Curve b bs) = curve a (as ++ (b : bs))
 
 rotate :: Curve -> Double -> Curve
-rotate (Curve a as) r = Curve (fr' a) (map fr' as)
+rotate (Curve a as) r = Curve (fn' a) (map fn' as)
     where
-        fr lcos lsin (Point (x,y)) = (point (x*lcos-y*lsin, x*lsin+y*lcos))
-        fr' = (fr (cos (r/180.0*pi)) (sin (r/180.0*pi)))
+        fn lcos lsin (Point (x,y)) = (point (x*lcos-y*lsin, x*lsin+y*lcos))
+        fn' = (fn (cos (r/180.0*pi)) (sin (r/180.0*pi)))
 
 translate :: Curve -> Point -> Curve
-translate (Curve a as) p = Curve (ft p a) (map (ft p) as)
+translate (Curve a as) p = Curve (fn p a) (map (fn p) as)
     where
-        ft (Point(xa, ya)) (Point(xb, yb)) = (Point(xa+xb,ya+yb))
+        fn (Point(xa, ya)) (Point(xb, yb)) = (Point(xa+xb,ya+yb))
 
-{-
-curve a ((as : b) ++ bs)
--}
+data Line = Vertical Double | Horizontal Double
+    deriving (Show)
+
+reflect :: Curve -> Line -> Curve
+reflect (Curve a as) (Vertical d) = Curve (fn d a) (map (fn d) as)
+    where
+        fn d' (Point(x,y)) = (Point(x+2*(d'-x),y))
+reflect (Curve a as) (Horizontal d) = Curve (fn d a) (map (fn d) as)
+    where
+        fn d' (Point(x,y)) = (Point(x,y+2*(d'-y)))
+
+c = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
+
