@@ -18,7 +18,6 @@ instance Eq Point where
     (Point(xa, ya)) == (Point(xb, yb)) =
         abs(xa - xb) < 0.01 && abs(ya - yb) < 0.01
 
-
 data Curve = Curve [Point]
     deriving (Show)
 
@@ -65,11 +64,8 @@ height c = abs((pointY pa) - (pointY pb))
 toList :: Curve -> [Point]
 toList (Curve ps) = ps
 
-
-cur = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
-
 toSVG :: Curve -> String
-toSVG c = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10px\" height=\"10px\" version=\"1.1\"><g>\n" ++
+toSVG c = (printf "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.0fpx\" height=\"%.0fpx\" version=\"1.1\"><g>\n" (width c) (height c))++
           toSVG' c ++ "</g></svg>"
     where
         fn :: (Point, Point) -> String
@@ -82,3 +78,15 @@ toSVG c = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10px\" height=\"10p
 toFile :: Curve -> FilePath -> IO ()
 toFile c f = writeFile f (toSVG c)
 
+hilbert :: Curve -> Curve
+hilbert c = c0 `connect` c1 `connect` c2 `connect` c3
+   where  w = width c
+          h = height c
+          p = 6
+
+          ch = reflect c $ Vertical 0
+
+          c0 = ch `rotate` (-90) `translate` point (w+p+w, h+p+h)
+          c1 = c `translate` point (w+p+w, h)
+          c2 = c
+          c3 = ch `rotate` 90 `translate` point (0, h+p)
