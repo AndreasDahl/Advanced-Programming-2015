@@ -65,3 +65,24 @@ toList (Curve ps) = ps
 
 
 cur = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
+
+toSVG :: Curve -> String
+toSVG c = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10px\" height=\"10px\" version=\"1.1\"><g>" ++
+          toSVG' c ++ "</g></svg>"
+    where
+        fn :: (Point, Point) -> String
+        fn ((Point(xa, ya)), (Point(xb, yb))) =
+            "<line style=\"stroke-width: 2px; stroke: black; fill:white\"\n x1=\"" ++
+            show xa ++ "\" x2=\"" ++ show xb ++ "\" y1=\"" ++
+            show ya ++ "\" y2=\"" ++ show yb ++ "\" />\n"
+        toSVG' (Curve (x:(y:ps))) = fn (x, y) ++ toSVG'(Curve(y:ps))
+        toSVG' _ = ""
+
+
+
+{-
+toSVG :: Curve -> String
+toSVG (Curve ps) = fold (++) ps
+    where
+        fn (Point(x, y)) = 
+-}
