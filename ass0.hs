@@ -51,8 +51,15 @@ reflect (Curve as) (Horizontal d) = Curve (map (fn d) as)
 bbox :: Curve -> (Point, Point)
 bbox (Curve ps) = (Point (minimum (map pointX ps), minimum (map pointY ps)),
                    Point (maximum (map pointX ps), maximum (map pointY ps)))
-        
+
+width :: Curve -> Double
+width c = abs((pointX pa) - (pointX pb))
+    where (pa, pb) = (bbox c)
+
+height :: Curve -> Double
+height c = abs((pointY pa) - (pointY pb))
+    where (pa, pb) = (bbox c)
 
 
 
-c = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
+cur = curve (Point(0.0,0.0)) [(Point(1.0,1.0)), (Point(2.0,2.0))]
