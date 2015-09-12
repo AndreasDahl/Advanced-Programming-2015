@@ -19,11 +19,26 @@ instance Arbitrary Curve where
     ps <- arbitrary
     return (curve p ps)
 
+instance Arbitrary Line where
+    arbitrary = do
+    n <- arbitrary
+    return (Vertical n)
+
 testPointX = quickCheck ((\ p@(Point(x,y)) -> pointX p == x) :: Point -> Bool)
 testPointY = quickCheck ((\ p@(Point(x,y)) -> pointY p == y) :: Point -> Bool)
 
 checkConnect = quickCheck (\ c1@(Curve p ps) c2@(Curve p2 ps2)
   -> c1 `connect` c2 == Curve p (ps ++ (p2 : ps2)))
+
+checkRotate = quickCheck (\ c a -> (c `rotate` a `rotate` (-a)) == c)
+
+checkTranslateToStartingPointDoesNothing = quickCheck
+    (\ c@(Curve p ps) -> translate c p == c)
+checkTranslateSetsProperStart = quickCheck
+    (\ c p -> let p2 = case translate c p of (Curve p2 _) -> p in p2 == p)
+
+checkReflect = quickCheck (\ c l -> (c `reflect` l `reflect` l) == c)
+
 
 -- Manual Tests
 testConnect = TestCase
