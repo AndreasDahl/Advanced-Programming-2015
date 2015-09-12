@@ -19,6 +19,7 @@ instance Arbitrary Curve where
     ps <- arbitrary
     return (curve p ps)
 
+-- Tests have also been run with a Horizontal variant of this
 instance Arbitrary Line where
     arbitrary = do
     n <- arbitrary
