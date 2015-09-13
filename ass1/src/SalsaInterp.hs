@@ -1,5 +1,6 @@
 module SalsaInterp where
 
+-- REMOVE
 type ColourName = String
 type Frame = [GpxInstr]
 type Animation = [Frame]
@@ -8,6 +9,7 @@ data GpxInstr = DrawRect Integer Integer Integer Integer ColourName
               deriving (Eq, Show)
 
 type Position = (Integer, Integer)
+---------
 
 interpolate :: Integer -> Position -> Position -> [Position]
 interpolate n (pStartX, pStartY) (pEndX, pEndY)
@@ -29,11 +31,15 @@ interpolate n (pStartX, pStartY) (pEndX, pEndY)
 type Context = Integer
 
 newtype Salsa a =
-    Salsa { runSalsa :: Context -> Either String (a, Context, Animation) }
+    Salsa { runSalsa :: Context -> Either String (a, Context) }
 
 instance Monad Salsa where
-    return a = Salsa $ \ context -> Right (a, context, [])
-    _ >>= _ = undefined
+    return a = Salsa $ \ context -> Right (a, context)
+    sa >>= f = Salsa $ \ con ->
+        case runSalsa sa con of
+            Left s -> Left s
+            Right (a, c) -> runSalsa (f a) c
+    fail msg = Salsa $ \ _ -> Left msg
 
 instance Functor Salsa where
   fmap f xs = xs >>= return . f
