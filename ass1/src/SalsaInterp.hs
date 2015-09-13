@@ -74,23 +74,35 @@ eval c (Div a b) = do
     y <- eval c b
     return $ x `quot` y
 eval c (Xproj i) = case shapeLookup c i of
-    Right (Rectangle (x, _) _) -> Right x
-    Right (Circle (x, _) _)    -> Right x
+    Right (Rectangle (x, _) _) -> return x
+    Right (Circle (x, _) _)    -> return x
     Left e                     -> Left e
 eval c (Yproj i) = case shapeLookup c i of
-    Right (Rectangle (_, y) _) -> Right y
-    Right (Circle (_, y) _)    -> Right y
+    Right (Rectangle (_, y) _) -> return y
+    Right (Circle (_, y) _)    -> return y
     Left e                     -> Left e
 
 
---astToShape :: Command -> Maybe Shape
---astToShape (Rect i x y w h c v) = Just $ Rectangle (x, y) v
+astToShape :: Context -> Command -> Either String Shape
+astToShape context (Rect i x y w h c v) = do
+    x' <- eval context x
+    y' <- eval context y
+    return (Rectangle (x', y') v)
+astToShape context (Circ i x y r c v) = do
+    x' <- eval context x
+    y' <- eval context y
+    return (Circle (x', y') v)
+
 
 
 command :: Command -> Salsa ()
-command (Rect i x y w h c v) = Salsa $ \ con -> Right ((), con , [])
-command _ = undefined
---command Circ c = undefined
---command Move m = undefined
+command rect@(Rect i x y w h c v) = Salsa $ \ con -> do
+        shape <- astToShape con rect
+        return ((), addShape con i shape, [])
+command circ@(Circ i x y r c v) = Salsa $ \ con -> do
+        shape <- astToShape con circ
+        return ((), addShape con i shape, [])
+command (Toggle i) = Salsa $ \ con -> return ((), con, [])
 --command Toggle t = undefined
 --command Par p = undefined
+command _ = undefined
