@@ -47,6 +47,10 @@ instance Applicative Salsa where
   pure = return
   df <*> dx = df >>= \f -> dx >>= return . f
 
+getPosition :: Shape -> Position
+getPosition (Rectangle p _ _ _) = p
+getPosition (Circle p _ _ _ ) = p
+
 addShape :: Context -> Ident -> Shape -> Context
 addShape (Con n shapes) id shape = Con n ((id, shape) : shapes)
 
@@ -96,10 +100,10 @@ astToShape context (Circ i x y r c v) = do
     r' <- eval context r
     return (Circle (x', y') r' c v)
 
+
 toggleShape :: Shape -> Shape
 toogleShape (Rectangle p s c b) = Rectangle p s c (not b)
 toggleShape (Circle p r c b)    = Circle p r c (not b)
-
 
 
 contextFrame :: Context -> Frame
@@ -114,25 +118,57 @@ contextFrame (Con n ((_, x):xs)) = case drawShape x of
         drawShape _ = Nothing
 
 
+contextAnimation :: Context -> Animation
+contextAnimation c@(Con n _) = replicate (fromIntegral n) (contextFrame c)
+
+updateShape :: Shape -> (Integer, Integer) -> Shape
+updateShape (Rectangle (x, y) (w, h) c b) (newX, newY)
+    = Rectangle (newX, newY) (w, h) c b
+updateShape (Circle (x, y) r c b) (newX, newY)
+    = Circle (newX, newY) r c b
+
+
+updateContext :: Context -> (Ident, Shape) -> Context
+updateContext (Con n shapes) (newId, newShape) =
+    Con n (map (\ (oldId, oldShape) -> if newId == oldId then (newId, newShape) else (oldId, oldShape)) shapes)
+
+move :: Context -> Ident -> Pos -> Either String (Context, Animation)
+move c@(Con n shapes) i (Abs x y) = do
+    x' <- eval c x
+    y' <- eval c y
+    shape <- shapeLookup c i
+    return $ fn c (i, shape) (interpolate n (getPosition shape) (x', y'))
+    where
+        fn :: Context -> (Ident, Shape) -> [Position] -> (Context, Animation)
+        fn c _ [] = (c, [])
+        fn c@(Con _ shapes) (i, shape) (p:ps) =
+            let newShape = updateShape shape p in
+            let newCon = updateContext c (i, newShape) in
+                case fn newCon (i, newShape) ps of
+                    (finalC, as) -> (finalC, contextFrame newCon : as)
+
 command :: Command -> Salsa ()
 command rect@(Rect i x y w h c v) = Salsa $ \ con -> do
         shape <- astToShape con rect
-        let newCon = addShape con i shape in return ((), newCon, [contextFrame newCon])
+        let newCon = addShape con i shape in return ((), newCon, contextAnimation newCon)
 command circ@(Circ i x y r c v) = Salsa $ \ con -> do
         shape <- astToShape con circ
-        let newCon = addShape con i shape in return ((), newCon, [contextFrame newCon])
+        let newCon = addShape con i shape in return ((), newCon, contextAnimation newCon)
 command (Toggle needle) = Salsa $ \ con@(Con n shapes) ->
     let newCon = Con n (map (\ (i, shape) -> (if needle == i
         then (i, toggleShape shape)
         else (i, shape))) shapes)
     in return ((), newCon, [])
---command (Move i p) = undefined
---command Par p = undefined
+command (Move i p) = Salsa $ \ con@(Con n shapes) -> do
+        (newCon, animation)<- move con i p
+        return ((), newCon, animation)
+--command (Par) p = undefined
 command _ = undefined
 
 prog = [
     Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True,
-    Circ "john" (Const 100) (Const 100) (Const 50) Red True ]
+    Circ "john" (Const 100) (Const 100) (Const 50) Red True,
+    Move "jens" (Abs (Const 200) (Const 200))]
 
 runProg :: Integer -> Program -> Either String Animation
 runProg n = fn (Con n [])
