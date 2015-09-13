@@ -2,6 +2,7 @@ module SalsaInterp where
 
 import SalsaAst
 import Gpx
+import Data.List
 
 type Position = (Integer, Integer)
 
@@ -22,11 +23,11 @@ interpolate n (pStartX, pStartY) (pEndX, pEndY)
                     yStep
                     next
 
-data Shape = Rect String Position Bool
-           | Circ String Position Bool
+data Shape = Rectangle Position Bool
+           | Circle Position Bool
     deriving(Show, Eq)
 
-data Context = Con (Integer, [Shape])
+data Context = Con Integer [(Ident, Shape)]
 
 newtype Salsa a =
     Salsa { runSalsa :: Context -> Either String (a, Context, Animation) }
@@ -45,3 +46,51 @@ instance Functor Salsa where
 instance Applicative Salsa where
   pure = return
   df <*> dx = df >>= \f -> dx >>= return . f
+
+addShape :: Context -> Ident -> Shape -> Context
+addShape (Con n shapes) id shape = Con n ((id, shape) : shapes)
+
+shapeLookup :: Context -> Ident -> Either String Shape
+shapeLookup (Con _ shapes) needle = case find (\ (i, _) -> needle == i) shapes of
+    Nothing -> Left $ "Could not find " ++ needle ++ " in context"
+    Just (_, s) -> Right s
+
+eval :: Context -> Expr -> Either String Integer
+eval c (Const i) = return i
+eval c (Plus a b) = do
+    x <- eval c a
+    y <- eval c b
+    return (x + y)
+eval c (Minus a b) = do
+    x <- eval c a
+    y <- eval c b
+    return $ x - y
+eval c (Mult a b) = do
+    x <- eval c a
+    y <- eval c b
+    return $ x * y
+eval c (Div a b) = do
+    x <- eval c a
+    y <- eval c b
+    return $ x `quot` y
+eval c (Xproj i) = case shapeLookup c i of
+    Right (Rectangle (x, _) _) -> Right x
+    Right (Circle (x, _) _)    -> Right x
+    Left e                     -> Left e
+eval c (Yproj i) = case shapeLookup c i of
+    Right (Rectangle (_, y) _) -> Right y
+    Right (Circle (_, y) _)    -> Right y
+    Left e                     -> Left e
+
+
+--astToShape :: Command -> Maybe Shape
+--astToShape (Rect i x y w h c v) = Just $ Rectangle (x, y) v
+
+
+command :: Command -> Salsa ()
+command (Rect i x y w h c v) = Salsa $ \ con -> Right ((), con , [])
+command _ = undefined
+--command Circ c = undefined
+--command Move m = undefined
+--command Toggle t = undefined
+--command Par p = undefined
