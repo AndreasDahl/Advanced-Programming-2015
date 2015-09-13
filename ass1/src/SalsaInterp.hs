@@ -104,11 +104,14 @@ toggleShape (Circle p r c b)    = Circle p r c (not b)
 
 contextFrame :: Context -> Frame
 contextFrame (Con n []) = []
-contextFrame (Con n ((_, x):xs)) = drawShape x : contextFrame (Con n xs)
+contextFrame (Con n ((_, x):xs)) = case drawShape x of
+        Nothing -> contextFrame (Con n xs)
+        Just x' -> x' : contextFrame (Con n xs)
     where
-        drawShape :: Shape -> GpxInstr
-        drawShape (Rectangle (x, y) (w, h) c True) = DrawRect x y w h (show c)
-        drawShape _ = undefined
+        drawShape :: Shape -> Maybe GpxInstr
+        drawShape (Rectangle (x, y) (w, h) c True) = return $ DrawRect x y w h (show c)
+        drawShape (Circle (x, y) r c True) = return $ DrawCirc x y r (show c)
+        drawShape _ = Nothing
 
 
 command :: Command -> Salsa ()
@@ -117,7 +120,7 @@ command rect@(Rect i x y w h c v) = Salsa $ \ con -> do
         let newCon = addShape con i shape in return ((), newCon, [contextFrame newCon])
 command circ@(Circ i x y r c v) = Salsa $ \ con -> do
         shape <- astToShape con circ
-        return ((), addShape con i shape, [])
+        let newCon = addShape con i shape in return ((), newCon, [contextFrame newCon])
 command (Toggle needle) = Salsa $ \ con@(Con n shapes) ->
     let newCon = Con n (map (\ (i, shape) -> (if needle == i
         then (i, toggleShape shape)
@@ -129,7 +132,7 @@ command _ = undefined
 
 prog = [
     Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True,
-    Rect "john" (Const 100) (Const 100) (Const 100) (Const 100) Red True ]
+    Circ "john" (Const 100) (Const 100) (Const 50) Red True ]
 
 runProg :: Integer -> Program -> Either String Animation
 runProg n = fn (Con n [])
