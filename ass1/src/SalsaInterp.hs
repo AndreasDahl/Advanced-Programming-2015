@@ -93,6 +93,9 @@ astToShape context (Circ i x y r c v) = do
     y' <- eval context y
     return (Circle (x', y') v)
 
+toggleShape :: Shape -> Shape
+toggleShape (Circle p b)    = Circle p (not b)
+toogleShape (Rectangle p b) = Rectangle p (not b)
 
 
 command :: Command -> Salsa ()
@@ -102,7 +105,11 @@ command rect@(Rect i x y w h c v) = Salsa $ \ con -> do
 command circ@(Circ i x y r c v) = Salsa $ \ con -> do
         shape <- astToShape con circ
         return ((), addShape con i shape, [])
-command (Toggle i) = Salsa $ \ con -> return ((), con, [])
+command (Toggle needle) = Salsa $ \ con@(Con n shapes) ->
+    let newCon = Con n (map (\ (i, shape) -> (if needle == i
+        then (i, toggleShape shape)
+        else (i, shape))) shapes)
+    in return ((), newCon, [])
 --command Toggle t = undefined
 --command Par p = undefined
 command _ = undefined
