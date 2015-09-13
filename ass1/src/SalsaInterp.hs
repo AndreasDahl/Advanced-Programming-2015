@@ -1,8 +1,8 @@
 module SalsaInterp where
 
-import SalsaAst
-import Gpx
-import Data.List
+import           Data.List
+import           Gpx
+import           SalsaAst
 
 type Position = (Integer, Integer)
 
@@ -80,11 +80,11 @@ eval c (Div a b) = do
 eval c (Xproj i) = case shapeLookup c i of
     Right (Rectangle (x, _) _ _ _) -> return x
     Right (Circle (x, _) _ _ _)    -> return x
-    Left e                     -> Left e
+    Left e                         -> Left e
 eval c (Yproj i) = case shapeLookup c i of
     Right (Rectangle (_, y) _ _ _) -> return y
     Right (Circle (_, y) _ _ _)    -> return y
-    Left e                     -> Left e
+    Left e                         -> Left e
 
 
 astToShape :: Context -> Command -> Either String Shape
@@ -165,7 +165,7 @@ command (Toggle needle) = Salsa $ \ (Con n shapes) ->
 command (Move i p) = Salsa $ \ con -> do
         (newCon, animation)<- move con i p
         return ((), newCon, animation)
---command (Par) p = undefined
+--TODO: command (Par) p = undefined
 command _ = undefined
 
 prog :: Program
