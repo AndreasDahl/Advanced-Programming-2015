@@ -23,8 +23,8 @@ interpolate n (pStartX, pStartY) (pEndX, pEndY)
                     yStep
                     next
 
-data Shape = Rectangle Position Bool
-           | Circle Position Bool
+data Shape = Rectangle Position (Integer, Integer) Colour Bool
+           | Circle Position Integer Colour Bool
     deriving(Show, Eq)
 
 data Context = Con Integer [(Ident, Shape)]
@@ -74,12 +74,12 @@ eval c (Div a b) = do
     y <- eval c b
     return $ x `quot` y
 eval c (Xproj i) = case shapeLookup c i of
-    Right (Rectangle (x, _) _) -> return x
-    Right (Circle (x, _) _)    -> return x
+    Right (Rectangle (x, _) _ _ _) -> return x
+    Right (Circle (x, _) _ _ _)    -> return x
     Left e                     -> Left e
 eval c (Yproj i) = case shapeLookup c i of
-    Right (Rectangle (_, y) _) -> return y
-    Right (Circle (_, y) _)    -> return y
+    Right (Rectangle (_, y) _ _ _) -> return y
+    Right (Circle (_, y) _ _ _)    -> return y
     Left e                     -> Left e
 
 
@@ -87,21 +87,34 @@ astToShape :: Context -> Command -> Either String Shape
 astToShape context (Rect i x y w h c v) = do
     x' <- eval context x
     y' <- eval context y
-    return (Rectangle (x', y') v)
+    w' <- eval context w
+    h' <- eval context h
+    return (Rectangle (x', y') (w', h') c v)
 astToShape context (Circ i x y r c v) = do
     x' <- eval context x
     y' <- eval context y
-    return (Circle (x', y') v)
+    r' <- eval context r
+    return (Circle (x', y') r' c v)
 
 toggleShape :: Shape -> Shape
-toggleShape (Circle p b)    = Circle p (not b)
-toogleShape (Rectangle p b) = Rectangle p (not b)
+toogleShape (Rectangle p s c b) = Rectangle p s c (not b)
+toggleShape (Circle p r c b)    = Circle p r c (not b)
+
+
+
+contextFrame :: Context -> Frame
+contextFrame (Con n []) = []
+contextFrame (Con n ((_, x):xs)) = drawShape x : contextFrame (Con n xs)
+    where
+        drawShape :: Shape -> GpxInstr
+        drawShape (Rectangle (x, y) (w, h) c True) = DrawRect x y w h (show c)
+        drawShape _ = undefined
 
 
 command :: Command -> Salsa ()
 command rect@(Rect i x y w h c v) = Salsa $ \ con -> do
         shape <- astToShape con rect
-        return ((), addShape con i shape, [])
+        let newCon = addShape con i shape in return ((), newCon, [contextFrame newCon])
 command circ@(Circ i x y r c v) = Salsa $ \ con -> do
         shape <- astToShape con circ
         return ((), addShape con i shape, [])
@@ -110,6 +123,20 @@ command (Toggle needle) = Salsa $ \ con@(Con n shapes) ->
         then (i, toggleShape shape)
         else (i, shape))) shapes)
     in return ((), newCon, [])
---command Toggle t = undefined
+--command (Move i p) = undefined
 --command Par p = undefined
 command _ = undefined
+
+prog = [
+    Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True,
+    Rect "john" (Const 100) (Const 100) (Const 100) (Const 100) Red True ]
+
+runProg :: Integer -> Program -> Either String Animation
+runProg n = fn (Con n [])
+    where
+        fn :: Context -> Program -> Either String Animation
+        fn _ [] = return []
+        fn context (f:fs) = do
+            (_, context', f') <- runSalsa (command f) context
+            a <- fn context' fs
+            return (f' ++ a)
