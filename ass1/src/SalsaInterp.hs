@@ -147,8 +147,20 @@ move c@(Con n _) i (Abs x y) = do
             let newCon = updateContext c' (i, newShape) in
                 case fn newCon newShape ps of
                     (finalC, as) -> (finalC, contextFrame newCon : as)
--- TODO: Relative position
-move _ _ (Rel _ _) = Left "Relative move not yet implemented"
+move c@(Con n _) i (Rel x y) = do
+    x' <- eval c x
+    y' <- eval c y
+    shape <- shapeLookup c i
+    let (shapeX, shapeY) = getPosition shape in return $ fn c shape (interpolate n (shapeX, shapeY) (x' + shapeX, y' + shapeY))
+    where
+        fn :: Context -> Shape -> [Position] -> (Context, Animation)
+        fn c' _ [] = (c', [])
+        fn c' shape (p:ps) =
+            let newShape = updateShape shape p in
+            let newCon = updateContext c' (i, newShape) in
+                case fn newCon newShape ps of
+                    (finalC, as) -> (finalC, contextFrame newCon : as)
+
 
 command :: Command -> Salsa ()
 command rect@(Rect i _ _ _ _ _ _) = Salsa $ \ con -> do
