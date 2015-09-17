@@ -1,5 +1,8 @@
 module SalsaParser where
-    
+
+import SimpleParse
+import Data.Char
+
 {---- SYNTAX ----
 
 Program    ::= Commands
@@ -33,4 +36,16 @@ Prim       ::= integer
              | '(' Expr ')'
 Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
-------------}
+------------} 
+
+integerParser :: Parser String
+integerParser = munch1 $ \ c -> isDigit c 
+
+
+
+
+
+
+
+
+
