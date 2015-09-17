@@ -41,7 +41,7 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 integerParser :: Parser Integer
 integerParser = do 
     i <- munch1 $ \ c -> isDigit c 
-    return $ read i
+    return $ read i  -- Not completely safe as read may crash
 
 identParser :: Parser String
 identParser = munch1 $ \ c -> isAscii c
