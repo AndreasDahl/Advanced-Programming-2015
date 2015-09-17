@@ -38,12 +38,13 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 ------------} 
 
-integerParser :: Parser String
-integerParser = munch1 $ \ c -> isDigit c 
+integerParser :: Parser Integer
+integerParser = do 
+    i <- munch1 $ \ c -> isDigit c 
+    return $ read i
 
-
-
-
+identParser :: Parser String
+identParser = munch1 $ \ c -> isAscii c
 
 
 
