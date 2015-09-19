@@ -1,7 +1,12 @@
 module SalsaParser where
 
-import SimpleParse
+import Control.Applicative hiding (Const)
 import Data.Char
+
+import SalsaAst
+import SimpleParse
+
+
 
 {---- SYNTAX ----
 
@@ -39,6 +44,7 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 ------------}
 
 
+
 integerParser :: Parser Integer
 integerParser = do
     i <- munch1 $ isDigit
@@ -49,7 +55,16 @@ identParser = do
     s <- munch1 $ \ c -> (isLetter c || c == '_' || isDigit c)
     if any (\ a -> s == a) ["rectangle","circle","hidden","toggle"]
         then reject else return s
-    
+
+colorParser :: Parser Colour
+colorParser = do 
+    c <-     (string "blue" >> return Blue) 
+         <|> (string "plum" >> return Plum)
+         <|> (string "red"  >> return Red)
+         <|> (string "green" >> return Green)
+         <|> (string "orange" >> return Orange)
+    return c
+
 
 
 
