@@ -86,9 +86,9 @@ testPrimParseInt = TestCase $
 testPrimParseNegInt = TestCase $
     assertEqual "for primParser \"-42\"," [] $ parseEof primParser "-42"
 testPrimParseXproj = TestCase $
-    assertEqual "for primParser \" test . x\"," [(Xproj "test", [])] $ parseEof primParser " test . x "
+    assertEqual "for primParser \" test . x\"," [(Xproj "test", [])] $ parseEof primParser " test . x"
 testPrimParseYproj = TestCase $
-    assertEqual "for primParser \" test . y\"," [(Yproj "test", [])] $ parseEof primParser " test . y "
+    assertEqual "for primParser \" test . y\"," [(Yproj "test", [])] $ parseEof primParser " test . y"
 testPrimParseElse1proj = TestCase $
     assertEqual "for primParser \" test . xy\"," [] $ parseEof primParser " test . xy"
 testPrimParseElse2proj = TestCase $
