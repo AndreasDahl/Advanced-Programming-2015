@@ -52,7 +52,7 @@ integerParser = do
     i <- munch1 isDigit
     return $ read i  -- Not completely safe as read may crash
 
-identParser :: Parser String
+identParser :: Parser Ident
 identParser = do
     s <- munch1 $ \ c -> isLetter c || c == '_' || isDigit c
     if firstIsInt s || any (\ a -> s == a) ["rectangle","circle",
@@ -61,6 +61,9 @@ identParser = do
     where
         firstIsInt (s:_) = isDigit s
         firstIsInt []    = False
+
+identsParser :: Parser [Ident]
+identsParser = many1 identParser 
 
 colourParser :: Parser Colour
 colourParser = (string "blue" >> return Blue) 
