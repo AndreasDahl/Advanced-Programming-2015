@@ -49,12 +49,12 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 integerParser :: Parser Integer
 integerParser = do
-    i <- munch1 $ isDigit
+    i <- munch1 isDigit
     return $ read i  -- Not completely safe as read may crash
 
 identParser :: Parser String
 identParser = do
-    s <- munch1 $ \ c -> (isLetter c || c == '_' || isDigit c)
+    s <- munch1 $ \ c -> isLetter c || c == '_' || isDigit c
     if firstIsInt s || any (\ a -> s == a) ["rectangle","circle",
             "hidden","toggle","blue","plum","red","green","orange"]
         then reject else return s
