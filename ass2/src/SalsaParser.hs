@@ -1,7 +1,13 @@
 module SalsaParser where
 
-import SimpleParse
+import Control.Monad ( MonadPlus(..), liftM )
+import Control.Applicative ( Applicative(..), Alternative((<|>), empty, many) )
 import Data.Char
+
+import SalsaAst
+import SimpleParse
+
+
 
 {---- SYNTAX ----
 
@@ -38,11 +44,6 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 ------------}
 
-import Control.Monad ( MonadPlus(..), liftM )
-import Control.Applicative ( Applicative(..), Alternative((<|>), empty, many) )
-
-
-
 
 
 
@@ -61,6 +62,14 @@ identParser = do
         firstIsInt (s:_) = isDigit s
         firstIsInt []    = False
 
+colorParser :: Parser Colour
+colorParser = do 
+    c <-     (string "blue" >> return Blue) 
+         <|> (string "plum" >> return Plum)
+         <|> (string "red"  >> return Red)
+         <|> (string "green" >> return Green)
+         <|> (string "orange" >> return Orange)
+    return c
 
 
 
