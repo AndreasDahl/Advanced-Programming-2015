@@ -1,8 +1,10 @@
 module SalsaParserTest where
 
+import Test.HUnit
+
+import SalsaAst
 import SimpleParse
 import SalsaParser
-import Test.HUnit
 
 -- integerParser
 testValidInteger = TestCase $
@@ -40,6 +42,21 @@ testInvalidIdentGreen = TestCase $
 testInvalidIdentOrange = TestCase $
     assertEqual "for identParser \"orange\"," [] $ parseEof identParser "orange"
 
+-- colourParser
+testParseBlue = TestCase $
+    assertEqual "for colourParser \"blue\"," [(Blue, [])] $ parseEof colourParser "blue"
+testParsePlum = TestCase $
+    assertEqual "for colourParser \"plum\"," [(Plum, [])] $ parseEof colourParser "plum"
+testParseRed = TestCase $
+    assertEqual "for colourParser \"red\"," [(Red, [])] $ parseEof colourParser "red"
+testParseGreen = TestCase $
+    assertEqual "for colourParser \"green\"," [(Green, [])] $ parseEof colourParser "green"
+testParseOrange = TestCase $
+    assertEqual "for colourParser \"orange\"," [(Orange, [])] $ parseEof colourParser "orange"
+
+testParseBadBlue = TestCase $
+    assertEqual "for colourParser \"Blue\"," [] $ parseEof colourParser "Blue"
+
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
     TestLabel "testValidIdentParser" testValidIdent,
@@ -54,4 +71,12 @@ tests = TestList [
     TestLabel "testInvalidIdentPlum" testInvalidIdentPlum,
     TestLabel "testInvalidIdentRed" testInvalidIdentRed,
     TestLabel "testInvalidIdentGreen" testInvalidIdentGreen,
-    TestLabel "testInvalidIdentOrange" testInvalidIdentOrange]
+    TestLabel "testInvalidIdentOrange" testInvalidIdentOrange,
+    testParseBlue,
+    testParsePlum,
+    testParseRed,
+    testParseGreen,
+    testParseOrange,
+    testParseBadBlue]
+
+
