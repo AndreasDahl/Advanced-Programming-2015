@@ -38,6 +38,13 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 ------------}
 
+import Control.Monad ( MonadPlus(..), liftM )
+import Control.Applicative ( Applicative(..), Alternative((<|>), empty, many) )
+
+
+
+
+
 
 integerParser :: Parser Integer
 integerParser = do
@@ -47,9 +54,12 @@ integerParser = do
 identParser :: Parser String
 identParser = do
     s <- munch1 $ \ c -> (isLetter c || c == '_' || isDigit c)
-    if any (\ a -> s == a) ["rectangle","circle","hidden","toggle"]
+    if firstIsInt s || any (\ a -> s == a) ["rectangle","circle",
+            "hidden","toggle","blue","plum","red","green","orange"]
         then reject else return s
-    
+    where
+        firstIsInt (s:_) = isDigit s
+        firstIsInt []    = False
 
 
 
