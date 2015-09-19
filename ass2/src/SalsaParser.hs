@@ -47,8 +47,9 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 {-
 
 Expr        ::= Prim
-              | Prim ExprOpt
-ExprOpt     ::= '*' Prim
+              | Prim '*' Expr
+              | Prim '/' Expr
+ExprOpt     ::= '*' Expr
               | '+' Prim
               | ...
  -}
@@ -79,9 +80,6 @@ colourParser = (symbol "blue" >> return Blue)
            <|> (symbol "green" >> return Green)
            <|> (symbol "orange" >> return Orange)
 
-exprParser :: Parser Expr
-exprParser = reject
-
 primParser :: Parser Expr
 primParser = do
     p <- constIP <|> (proj 'x') <|> (proj 'y') <|> expr
@@ -108,8 +106,18 @@ exprParser = primParser
         return $ expr)
     where
         exprOptParser :: Expr -> Parser Expr
-        exprOptParser p1 = do 
+        exprOptParser p1 = (do 
+            _ <- schar '*' 
+            p2 <- exprParser
+            return $ Mult p1 p2) <|> (do 
             _ <- schar '/' 
-            p2 <- primParser
-            return $ Div p1 p2 
+            p2 <- exprParser
+            return $ Div p1 p2) <|> (do 
+            _ <- schar '+' 
+            p2 <- exprParser
+            return $ Plus p1 p2) <|> (do 
+            _ <- schar '-' 
+            p2 <- exprParser
+            return $ Minus p1 p2) 
+
 
