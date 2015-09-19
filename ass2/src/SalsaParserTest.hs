@@ -8,7 +8,19 @@ import SalsaParser
 
 -- integerParser
 testValidInteger = TestCase $
-    assertEqual "for integerParser," [(1234567890, [])] (parseEof integerParser "1234567890")
+    assertEqual "for integerParser \"1234567890\"," [(1234567890, [])] (parseEof integerParser "1234567890")
+
+testValidIntegerWithSpace = TestCase $
+    assertEqual "for integerParser \" 123\"," [(123, [])] $
+    parseEof integerParser " 123"
+
+testInvalidInteger = TestCase $
+    assertEqual "for integerParser \"ab123\"," [] $
+    parseEof integerParser "ab123"
+
+testInvalidNegativeInteger = TestCase $
+    assertEqual "for integerParser \"-123\"," [] $
+    parseEof integerParser "-123"
 
 -- identParser
 testValidIdent = TestCase $
@@ -42,6 +54,12 @@ testInvalidIdentGreen = TestCase $
 testInvalidIdentOrange = TestCase $
     assertEqual "for identParser \"orange\"," [] $ parseEof identParser "orange"
 
+-- identsParser
+testIdentsParserSpace = TestCase $
+    assertEqual "for identsParser \"foo bar\"," [(["foo", "bar"], [])] $
+    parseEof identsParser "foo bar"
+
+
 -- colourParser
 testParseBlue = TestCase $
     assertEqual "for colourParser \"blue\"," [(Blue, [])] $ parseEof colourParser "blue"
@@ -57,8 +75,15 @@ testParseOrange = TestCase $
 testParseBadBlue = TestCase $
     assertEqual "for colourParser \"Blue\"," [] $ parseEof colourParser "Blue"
 
+testParseColourWithSpace = TestCase $
+    assertEqual "for colourParser \" blue\"," [(Blue, [])] $
+    parseEof colourParser " blue"
+
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
+    testValidIntegerWithSpace,
+    testInvalidInteger,
+    testInvalidNegativeInteger,
     TestLabel "testValidIdentParser" testValidIdent,
     TestLabel "testValidIdentWithOnlyDigits" testValidIdentWithOnlyDigits,
     TestLabel "testValidIdentWithDigits" testValidIdentWithDigits,
@@ -72,11 +97,13 @@ tests = TestList [
     TestLabel "testInvalidIdentRed" testInvalidIdentRed,
     TestLabel "testInvalidIdentGreen" testInvalidIdentGreen,
     TestLabel "testInvalidIdentOrange" testInvalidIdentOrange,
+    testIdentsParserSpace,
     testParseBlue,
     testParsePlum,
     testParseRed,
     testParseGreen,
     testParseOrange,
-    testParseBadBlue]
+    testParseBadBlue,
+    testParseColourWithSpace]
 
 

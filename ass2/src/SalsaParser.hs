@@ -48,12 +48,12 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 integerParser :: Parser Integer
 integerParser = do
-    i <- munch1 isDigit
+    i <- token $ munch1 isDigit
     return $ read i  -- Not completely safe as read may crash
 
 identParser :: Parser Ident
 identParser = do
-    s <- munch1 $ \ c -> isLetter c || c == '_' || isDigit c
+    s <- token $ munch1 $ \ c -> isLetter c || c == '_' || isDigit c
     if firstIsInt s || any (\ a -> s == a) ["rectangle","circle",
             "hidden","toggle","blue","plum","red","green","orange"]
         then reject else return s
@@ -61,12 +61,15 @@ identParser = do
         firstIsInt (s:_) = isDigit s
         firstIsInt []    = False
 
+identsParser :: Parser [Ident]
+identsParser = many1 identParser 
+
 colourParser :: Parser Colour
-colourParser = (string "blue" >> return Blue) 
-         <|> (string "plum" >> return Plum)
-         <|> (string "red"  >> return Red)
-         <|> (string "green" >> return Green)
-         <|> (string "orange" >> return Orange)
+colourParser = (symbol "blue" >> return Blue) 
+           <|> (symbol "plum" >> return Plum)
+           <|> (symbol "red"  >> return Red)
+           <|> (symbol "green" >> return Green)
+           <|> (symbol "orange" >> return Orange)
 
 primParser :: Parser Expr
 primParser = do
