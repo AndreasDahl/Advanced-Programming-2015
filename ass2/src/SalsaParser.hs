@@ -88,16 +88,14 @@ colourParser = (symbol "blue" >> return Blue)
            <|> (symbol "orange" >> return Orange)
 
 primParser :: Parser Expr
-primParser = do
-    p <- constIP <|> (proj 'x') <|> (proj 'y') <|> expr
-    return p
+primParser = constIP <|> proj 'x' <|> proj 'y' <|> expr
     where
         constIP = do
             i <- integerParser
             return $ Const i
         proj c = do
             i <- identParser
-            _ <- (schar '.') >> (schar c)
+            _ <- schar '.' >> schar c
             if c == 'x' then return $ Xproj i else return $ Yproj i
         expr = do
             _ <- schar '('
@@ -109,8 +107,7 @@ exprParser :: Parser Expr
 exprParser = primParser 
     <|> (do
         p <- primParser
-        expr <- exprOptParser p
-        return $ expr)
+        exprOptParser p)
     where
         exprOptParser :: Expr -> Parser Expr
         exprOptParser p1 = (do 
@@ -129,19 +126,22 @@ exprParser = primParser
 
 posParser :: Parser Pos
 posParser = (do
-    _ <- schar '('
-    e1 <- exprParser
-    _ <- schar ','
-    e2 <- exprParser
-    _ <- schar ')'
-    return $ Abs e1 e2) <|> (do
-    _ <- schar '+'
-    _ <- schar '('
-    e1 <- exprParser
-    _ <- schar ','
-    e2 <- exprParser
-    _ <- schar ')'
+    (e1, e2) <- getExprs
+    return $ Abs e1 e2) 
+        <|> (do
+    _        <- schar '+'
+    (e1, e2) <- getExprs
     return $ Rel e1 e2)
+    where
+        getExprs :: Parser (Expr, Expr)
+        getExprs = do
+            _ <- schar '('
+            e1 <- exprParser
+            _ <- schar ','
+            e2 <- exprParser
+            _ <- schar ')'
+            return (e1, e2)
+
 
 
 
