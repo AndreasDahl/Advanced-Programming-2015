@@ -39,8 +39,8 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 ------------} 
 
 integerParser :: Parser Integer
-integerParser = do 
-    i <- munch1 $ \ c -> isDigit c 
+integerParser = do
+    i <- munch1 $ isDigit
     return $ read i  -- Not completely safe as read may crash
 
 identParser :: Parser String
