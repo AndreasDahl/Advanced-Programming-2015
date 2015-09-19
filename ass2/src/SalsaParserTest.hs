@@ -134,9 +134,20 @@ testSimpleHiddenCircDef = TestCase $
     [(Circ "a" (Const 1) (Const 2) (Const 3) Red False,"")] $
     parseEof (shapeDefParser False) "circle a 1 2 3 red"
 
+-- commandParser
+testHiddenShapeCommand = TestCase $
+    assertEqual "for commandParser \"hidden rectangle a 1 2 3 4 red\","
+    [(Rect "a" (Const 1) (Const 2) (Const 3) (Const 4) Red False, "")] $
+    parseEof commandParser "hidden rectangle a 1 2 3 4 red"
+
+testHiddenShapeNoSpace = TestCase $
+    assertEqual "for commandParser \"hiddenrectangle a 1 2 3 4 red\"," [] $
+    parseEof commandParser "hiddenrectangle a 1 2 3 4 red"
 
 
 tests = TestList [
+    testHiddenShapeCommand,
+    testHiddenShapeNoSpace,
     TestLabel "testValidInteger" testValidInteger,
     testValidIntegerWithSpace,
     testInvalidInteger,

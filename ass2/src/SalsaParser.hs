@@ -163,5 +163,11 @@ shapeDefParser hidden = rectParser <|> circleParser
             c <- colourParser
             return $ Circ i x y r c hidden
             
-
+commandParser :: Parser Command
+commandParser = (do 
+                _ <- symbol "toggle" >> space
+                i <- identParser
+                return $ Toggle i) <|>
+                shapeDefParser True <|>
+                (symbol "hidden" >> space >> shapeDefParser False) 
 
