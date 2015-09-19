@@ -11,6 +11,9 @@ testValidInteger = TestCase $
 -- identParser
 testValidIdent = TestCase $
     assertEqual "for identParser \"abc_d\"," [("abc_d", [])] (parseEof identParser "abc_d")
+testValidIdentWithDigits = TestCase $
+    assertEqual "for identParser \"123\"," [("123", [])] (parseEof identParser "123")
+
 
 testInvalidIdentDash = TestCase $
     assertEqual "for identParser \"a-b\"," [] $ parseEof identParser "a-b"
@@ -38,6 +41,7 @@ testInvalidIdentOrange = TestCase $
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
     TestLabel "testValidIdentParser" testValidIdent,
+    TestLabel "testValidIdentParserWithDigits" testValidIdentWithDigits,
     TestLabel "testInvalidIdentDash" testInvalidIdentDash,
     TestLabel "testInvalidIdentRectangle" testInvalidIdentRectangle,
     TestLabel "testInvalidIdentCircle" testInvalidIdentCircle,
