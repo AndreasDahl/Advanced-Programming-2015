@@ -71,29 +71,26 @@ colourParser = (symbol "blue" >> return Blue)
            <|> (symbol "green" >> return Green)
            <|> (symbol "orange" >> return Orange)
 
+exprParser :: Parser Expr
+exprParser = reject
+
 primParser :: Parser Expr
 primParser = do
-    p <- constIP-- <|>
-         --(identParser >> (schar '.') >> (schar 'x')) <|>
-         --(identParser >> (schar '.') >> (schar 'y')) <|>
+    p <- constIP <|> (proj 'x') <|> (proj 'y') <|> expr
     return p
     where
         constIP = do
             i <- integerParser
             return $ Const i
+        proj c = do
+            i <- identParser
+            _ <- (schar '.') >> (schar c)
+            if c == 'x' then return $ Xproj i else return $ Yproj i
+        expr = do
+            _ <- schar '('
+            e <- exprParser
+            _ <- schar ')'
+            return e
 
-
-
-{-exprParser :: Parser Expr
-exprParser = do
-    s <- munch1 $ isLetter
-    
-primParser :: Parser Expr
-primParser = do
-    p <- integerParser <|>
-         (identParser >> (schar '.') >> (schar 'x')) <|>
-         (identParser >> (schar '.') >> (schar 'y')) --<|>
-    return p-}
-         --((char '(') >> Expr >> (schar ')'))
 
 
