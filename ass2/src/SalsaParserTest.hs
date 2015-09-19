@@ -116,6 +116,24 @@ testSimpleRelPos = TestCase $
     assertEqual "for posParser \"+(1,2)\"," [(Rel (Const 1) (Const 2), "")] $
     parseEof posParser "+(1,2)"
 
+-- shapeDefParser
+testSimpleVisibleRectDef = TestCase $
+    assertEqual "for (shapeDefParser True) \"rectangle a 1 2 3 4 red\","
+    [(Rect "a" (Const 1) (Const 2) (Const 3) (Const 4) Red True,"")] $
+    parseEof (shapeDefParser True) "rectangle a 1 2 3 4 red"
+testSimpleVisibleCircDef = TestCase $
+    assertEqual "for (shapeDefParser True) \"circle a 1 2 3 red\","
+    [(Circ "a" (Const 1) (Const 2) (Const 3) Red True,"")] $
+    parseEof (shapeDefParser True) "circle a 1 2 3 red"
+testSimpleHiddenRectDef = TestCase $
+    assertEqual "for (shapeDefParser False) \"rectangle a 1 2 3 4 red\","
+    [(Rect "a" (Const 1) (Const 2) (Const 3) (Const 4) Red False,"")] $
+    parseEof (shapeDefParser False) "rectangle a 1 2 3 4 red"
+testSimpleHiddenCircDef = TestCase $
+    assertEqual "for (shapeDefParser False) \"circle a 1 2 3 red\","
+    [(Circ "a" (Const 1) (Const 2) (Const 3) Red False,"")] $
+    parseEof (shapeDefParser False) "circle a 1 2 3 red"
+
 
 
 tests = TestList [
@@ -154,6 +172,10 @@ tests = TestList [
     testExprAssociation,
     testExprPrecedence,
     testSimpleAbsPos,
-    testSimpleRelPos]
+    testSimpleRelPos,
+    testSimpleVisibleRectDef,
+    testSimpleVisibleCircDef,
+    testSimpleHiddenRectDef,
+    testSimpleHiddenCircDef]
 
 

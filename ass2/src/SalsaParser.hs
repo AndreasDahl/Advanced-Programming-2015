@@ -142,6 +142,26 @@ posParser = (do
             _ <- schar ')'
             return (e1, e2)
 
-
+shapeDefParser :: Bool -> Parser Command
+shapeDefParser hidden = rectParser <|> circleParser
+    where
+        rectParser = do
+            _ <- symbol "rectangle"
+            i <- identParser
+            x <- exprParser
+            y <- exprParser
+            w <- exprParser
+            h <- exprParser
+            c <- colourParser
+            return $ Rect i x y w h c hidden
+        circleParser = do
+            _ <- symbol "circle"
+            i <- identParser
+            x <- exprParser
+            y <- exprParser
+            r <- exprParser
+            c <- colourParser
+            return $ Circ i x y r c hidden
+            
 
 
