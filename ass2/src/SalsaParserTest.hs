@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module SalsaParserTest where
 
 import Test.HUnit
@@ -79,6 +80,20 @@ testParseColourWithSpace = TestCase $
     assertEqual "for colourParser \" blue\"," [(Blue, [])] $
     parseEof colourParser " blue"
 
+-- primParser
+testPrimParseInt = TestCase $
+    assertEqual "for primParser \"int\"," [(Const 42, [])] $ parseEof primParser " 42"
+testPrimParseNegInt = TestCase $
+    assertEqual "for primParser \"int\"," [] $ parseEof primParser "-42"
+testPrimParseXproj = TestCase $
+    assertEqual "for primParser \"int\"," [(Xproj "test", [])] $ parseEof primParser " test . x "
+testPrimParseYproj = TestCase $
+    assertEqual "for primParser \"int\"," [(Yproj "test", [])] $ parseEof primParser " test . y "
+testPrimParseElse1proj = TestCase $
+    assertEqual "for primParser \"int\"," [] $ parseEof primParser " test . xy"
+testPrimParseElse2proj = TestCase $
+    assertEqual "for primParser \"int\"," [] $ parseEof primParser " test . z"
+
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
     testValidIntegerWithSpace,
@@ -104,6 +119,12 @@ tests = TestList [
     testParseGreen,
     testParseOrange,
     testParseBadBlue,
-    testParseColourWithSpace]
+    testParseColourWithSpace,
+    testPrimParseInt,
+    testPrimParseNegInt,
+    testPrimParseXproj,
+    testPrimParseYproj,
+    testPrimParseElse1proj,
+    testPrimParseElse2proj]
 
 
