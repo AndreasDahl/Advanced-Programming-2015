@@ -44,8 +44,11 @@ integerParser = do
     return $ read i  -- Not completely safe as read may crash
 
 identParser :: Parser String
-identParser = munch1 $ \ c -> isAscii c
-
+identParser = do
+    s <- munch1 $ isAscii
+    if any (\ a -> s == a) ["rectangle","circle","hidden","toggle"]
+        then reject else return s
+    
 
 
 
