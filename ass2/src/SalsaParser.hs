@@ -46,13 +46,12 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 
 
-
 integerParser :: Parser Integer
 integerParser = do
     i <- munch1 isDigit
     return $ read i  -- Not completely safe as read may crash
 
-identParser :: Parser String
+identParser :: Parser Ident
 identParser = do
     s <- munch1 $ \ c -> isLetter c || c == '_' || isDigit c
     if firstIsInt s || any (\ a -> s == a) ["rectangle","circle",
@@ -69,5 +68,29 @@ colourParser = (string "blue" >> return Blue)
          <|> (string "green" >> return Green)
          <|> (string "orange" >> return Orange)
 
+primParser :: Parser Expr
+primParser = do
+    p <- constIP-- <|>
+         --(identParser >> (schar '.') >> (schar 'x')) <|>
+         --(identParser >> (schar '.') >> (schar 'y')) <|>
+    return p
+    where
+        constIP = do
+            i <- integerParser
+            return $ Const i
+
+
+
+{-exprParser :: Parser Expr
+exprParser = do
+    s <- munch1 $ isLetter
+    
+primParser :: Parser Expr
+primParser = do
+    p <- integerParser <|>
+         (identParser >> (schar '.') >> (schar 'x')) <|>
+         (identParser >> (schar '.') >> (schar 'y')) --<|>
+    return p-}
+         --((char '(') >> Expr >> (schar ')'))
 
 
