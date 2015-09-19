@@ -82,17 +82,30 @@ testParseColourWithSpace = TestCase $
 
 -- primParser
 testPrimParseInt = TestCase $
-    assertEqual "for primParser \"int\"," [(Const 42, [])] $ parseEof primParser " 42"
+    assertEqual "for primParser \" 42\"," [(Const 42, [])] $ parseEof primParser " 42"
 testPrimParseNegInt = TestCase $
-    assertEqual "for primParser \"int\"," [] $ parseEof primParser "-42"
+    assertEqual "for primParser \"-42\"," [] $ parseEof primParser "-42"
 testPrimParseXproj = TestCase $
-    assertEqual "for primParser \"int\"," [(Xproj "test", [])] $ parseEof primParser " test . x "
+    assertEqual "for primParser \" test . x\"," [(Xproj "test", [])] $ parseEof primParser " test . x "
 testPrimParseYproj = TestCase $
-    assertEqual "for primParser \"int\"," [(Yproj "test", [])] $ parseEof primParser " test . y "
+    assertEqual "for primParser \" test . y\"," [(Yproj "test", [])] $ parseEof primParser " test . y "
 testPrimParseElse1proj = TestCase $
-    assertEqual "for primParser \"int\"," [] $ parseEof primParser " test . xy"
+    assertEqual "for primParser \" test . xy\"," [] $ parseEof primParser " test . xy"
 testPrimParseElse2proj = TestCase $
-    assertEqual "for primParser \"int\"," [] $ parseEof primParser " test . z"
+    assertEqual "for primParser \" test . z\"," [] $ parseEof primParser " test . z"
+
+-- exprParser
+testSimpleExpr = TestCase $
+    assertEqual "for exprParser \"1 * 2\"," [(Mult (Const 1) (Const 2), [])] $ 
+    parseEof exprParser "1 * 2"
+
+testExprAssociation = TestCase $
+    assertEqual "for exprParser \"1 - 2 - 3\"," [(Minus (Minus (Const 1) (Const 2)) (Const 3), "")] $
+    parseEof exprParser "1 - 2 - 3"
+
+testExprPrecedence = TestCase $
+    assertEqual "for exprParser \"1 + 2 * 3\"," [(Plus (Const 1) (Mult (Const 2) (Const 3)), "")] $ 
+    parseEof exprParser "1 + 2 * 3"
 
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
@@ -125,6 +138,9 @@ tests = TestList [
     testPrimParseXproj,
     testPrimParseYproj,
     testPrimParseElse1proj,
-    testPrimParseElse2proj]
+    testPrimParseElse2proj,
+    testSimpleExpr,
+    testExprAssociation,
+    testExprPrecedence]
 
 
