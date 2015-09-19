@@ -107,6 +107,17 @@ testExprPrecedence = TestCase $
     assertEqual "for exprParser \"1 + 2 * 3\"," [(Plus (Const 1) (Mult (Const 2) (Const 3)), "")] $ 
     parseEof exprParser "1 + 2 * 3"
 
+-- posParser
+testSimpleAbsPos = TestCase $
+    assertEqual "for posParser \"(1,2)\"," [(Abs (Const 1) (Const 2), "")] $
+    parseEof posParser "(1,2)"
+
+testSimpleRelPos = TestCase $
+    assertEqual "for posParser \"+(1,2)\"," [(Rel (Const 1) (Const 2), "")] $
+    parseEof posParser "+(1,2)"
+
+
+
 tests = TestList [
     TestLabel "testValidInteger" testValidInteger,
     testValidIntegerWithSpace,
@@ -141,6 +152,8 @@ tests = TestList [
     testPrimParseElse2proj,
     testSimpleExpr,
     testExprAssociation,
-    testExprPrecedence]
+    testExprPrecedence,
+    testSimpleAbsPos,
+    testSimpleRelPos]
 
 

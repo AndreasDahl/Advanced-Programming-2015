@@ -120,4 +120,21 @@ exprParser = primParser
             p2 <- exprParser
             return $ Minus p1 p2) 
 
+posParser :: Parser Pos
+posParser = (do
+    _ <- schar '('
+    e1 <- exprParser
+    _ <- schar ','
+    e2 <- exprParser
+    _ <- schar ')'
+    return $ Abs e1 e2) <|> (do
+    _ <- schar '+'
+    _ <- schar '('
+    e1 <- exprParser
+    _ <- schar ','
+    e2 <- exprParser
+    _ <- schar ')'
+    return $ Rel e1 e2)
+
+
 
