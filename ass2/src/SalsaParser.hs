@@ -63,13 +63,11 @@ identParser = do
         firstIsInt []    = False
 
 colourParser :: Parser Colour
-colourParser = do 
-    c <-     (string "blue" >> return Blue) 
+colourParser = (string "blue" >> return Blue) 
          <|> (string "plum" >> return Plum)
          <|> (string "red"  >> return Red)
          <|> (string "green" >> return Green)
          <|> (string "orange" >> return Orange)
-    return c
 
 
 
