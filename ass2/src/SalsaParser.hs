@@ -46,13 +46,20 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 {-
 
-Expr        ::= Prim
-              | Prim '*' Expr
-              | Prim '/' Expr
-ExprOpt     ::= '*' Expr
-              | '+' Prim
-              | ...
- -}
+ExprE      ::= ExprT ExprEopt
+ExprEopt   ::= '+' ExprT ExprEopt
+             | '-' ExprT ExprEopt
+             | None
+ExprT      ::= Prim ExprTopt
+ExprTopt   ::= '*' Prim ExprTopt
+             | '/' Prim ExprTopt
+             | None
+Prim       ::= integer
+             | Ident '.' 'x'
+             | Ident '.' 'y'
+             | '(' Expr ')'
+
+-}
 
 
 integerParser :: Parser Integer
