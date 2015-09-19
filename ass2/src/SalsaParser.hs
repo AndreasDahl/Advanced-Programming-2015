@@ -44,6 +44,14 @@ Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 ------------}
 
+{-
+
+Expr        ::= Prim
+              | Prim ExprOpt
+ExprOpt     ::= '*' Prim
+              | '+' Prim
+              | ...
+ -}
 
 
 integerParser :: Parser Integer
@@ -92,5 +100,16 @@ primParser = do
             _ <- schar ')'
             return e
 
-
+exprParser :: Parser Expr
+exprParser = primParser 
+    <|> (do
+        p <- primParser
+        expr <- exprOptParser p
+        return $ expr)
+    where
+        exprOptParser :: Expr -> Parser Expr
+        exprOptParser p1 = do 
+            _ <- schar '/' 
+            p2 <- primParser
+            return $ Div p1 p2 
 
