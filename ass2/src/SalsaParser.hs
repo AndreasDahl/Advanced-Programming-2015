@@ -36,7 +36,8 @@ Prim       ::= integer
              | '(' Expr ')'
 Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
-------------} 
+------------}
+
 
 integerParser :: Parser Integer
 integerParser = do
@@ -45,7 +46,7 @@ integerParser = do
 
 identParser :: Parser String
 identParser = do
-    s <- munch1 $ isAscii
+    s <- munch1 $ \ c -> (isLetter c || c == '_' || isDigit c)
     if any (\ a -> s == a) ["rectangle","circle","hidden","toggle"]
         then reject else return s
     
