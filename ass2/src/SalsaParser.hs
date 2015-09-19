@@ -104,27 +104,14 @@ primParser = constIP <|> proj 'x' <|> proj 'y' <|> expr
             return e
 
 exprParser :: Parser Expr
-exprParser = primParser 
-    <|> (do
-        p <- primParser
-        exprOptParser p)
+exprParser = termParser `chainl1` addOp
     where
-        exprOptParser :: Expr -> Parser Expr
-        exprOptParser p1 = (do 
-            _ <- schar '*' 
-            p2 <- exprParser
-            return $ Mult p1 p2) <|> (do 
-            _ <- schar '/' 
-            p2 <- exprParser
-            return $ Div p1 p2) <|> (do 
-            _ <- schar '+' 
-            p2 <- exprParser
-            return $ Plus p1 p2) <|> (do 
-            _ <- schar '-' 
-            p2 <- exprParser
-            return $ Minus p1 p2) 
+        termParser = primParser `chainl1` mulOp
+        mulOp = do{ schar '*'; return Mult  } 
+            <|> do{ schar '/'; return Div   }
+        addOp = do{ schar '+'; return Plus  } 
+            <|> do{ schar '-'; return Minus }
 
-posParser :: Parser Pos
 posParser = (do
     (e1, e2) <- getExprs
     return $ Abs e1 e2) 
