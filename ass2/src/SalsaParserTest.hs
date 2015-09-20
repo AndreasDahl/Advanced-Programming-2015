@@ -96,7 +96,7 @@ testPrimParseElse2proj = TestCase $
 
 -- exprParser
 testSimpleExpr = TestCase $
-    assertEqual "for exprParser \"1 * 2\"," [(Mult (Const 1) (Const 2), [])] $ 
+    assertEqual "for exprParser \"1 * 2\"," [(Mult (Const 1) (Const 2), [])] $
     parseEof exprParser "1 * 2"
 
 testExprAssociation = TestCase $
@@ -104,7 +104,7 @@ testExprAssociation = TestCase $
     parseEof exprParser "1 - 2 - 3"
 
 testExprPrecedence = TestCase $
-    assertEqual "for exprParser \"1 + 2 * 3\"," [(Plus (Const 1) (Mult (Const 2) (Const 3)), "")] $ 
+    assertEqual "for exprParser \"1 + 2 * 3\"," [(Plus (Const 1) (Mult (Const 2) (Const 3)), "")] $
     parseEof exprParser "1 + 2 * 3"
 
 -- posParser
@@ -144,10 +144,26 @@ testHiddenShapeNoSpace = TestCase $
     assertEqual "for commandParser \"hiddenrectangle a 1 2 3 4 red\"," [] $
     parseEof commandParser "hiddenrectangle a 1 2 3 4 red"
 
+testToggleCommand = TestCase $
+    assertEqual "for commandParser \"toggle foo\"," [(Toggle "foo", "")] $
+    parseEof commandParser "toggle foo"
+
+testParallelCommands = TestCase $
+    assertEqual "for commandParser \"toggle foo || toggle bar\","
+    [(Par (Toggle "foo") (Toggle "bar"), "")] $
+    parseEof commandParser "toggle foo || toggle bar"
+
+testMoveMultipleCommand = TestCase $
+    assertEqual "for commandParser \"foo bar -> (1,2)\","
+    [(Par (Move "foo" (Abs (Const 1) (Const 2))) (Move "bar" (Abs (Const 1) (Const 2))), "")] $
+    parseEof commandParser "foo bar -> (1,2)"
 
 tests = TestList [
     testHiddenShapeCommand,
     testHiddenShapeNoSpace,
+    testToggleCommand,
+    testParallelCommands,
+    testMoveMultipleCommand,
     TestLabel "testValidInteger" testValidInteger,
     testValidIntegerWithSpace,
     testInvalidInteger,
@@ -188,5 +204,3 @@ tests = TestList [
     testSimpleVisibleCircDef,
     testSimpleHiddenRectDef,
     testSimpleHiddenCircDef]
-
-

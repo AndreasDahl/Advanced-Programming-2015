@@ -78,10 +78,10 @@ identParser = do
         firstIsInt []    = False
 
 identsParser :: Parser [Ident]
-identsParser = many1 identParser 
+identsParser = many1 identParser
 
 colourParser :: Parser Colour
-colourParser = (symbol "blue" >> return Blue) 
+colourParser = (symbol "blue" >> return Blue)
            <|> (symbol "plum" >> return Plum)
            <|> (symbol "red"  >> return Red)
            <|> (symbol "green" >> return Green)
@@ -106,15 +106,15 @@ primParser = constIP <|> proj 'x' <|> proj 'y' <|> expr
 exprParser :: Parser Expr
 exprParser = primParser `chainl1` mulOp `chainl1` addOp
     where
-        mulOp = do{ _ <- schar '*'; return Mult  } 
+        mulOp = do{ _ <- schar '*'; return Mult  }
             <|> do{ _ <- schar '/'; return Div   }
-        addOp = do{ _ <- schar '+'; return Plus  } 
+        addOp = do{ _ <- schar '+'; return Plus  }
             <|> do{ _ <- schar '-'; return Minus }
 
 posParser :: Parser Pos
 posParser = (do
     (e1, e2) <- getExprs
-    return $ Abs e1 e2) 
+    return $ Abs e1 e2)
         <|> (do
     _        <- schar '+'
     (e1, e2) <- getExprs
@@ -149,12 +149,26 @@ shapeDefParser hidden = rectParser <|> circleParser
             r <- exprParser
             c <- colourParser
             return $ Circ i x y r c hidden
-            
+
+m1 = Move "hest" (Abs (Const 1) (Const 2))
+m2 = Move "ko" (Abs (Const 1) (Const 2))
+
 commandParser :: Parser Command
-commandParser = (do 
+commandParser = commandOpt <|> do
+    c1 <- commandOpt
+    _  <- symbol "||"
+    c2 <- commandParser
+    return $ Par c1 c2
+    where
+        parOp = do{ _ <- symbol "||"; return Par }
+        commandOpt :: Parser Command
+        commandOpt = (do
                 _ <- symbol "toggle" >> space
                 i <- identParser
                 return $ Toggle i) <|>
-                shapeDefParser True <|>
-                (symbol "hidden" >> space >> shapeDefParser False) 
-
+            shapeDefParser True <|>
+            (symbol "hidden" >> space >> shapeDefParser False) <|> (do
+                ids <- identsParser
+                _   <- symbol "->"
+                pos <- posParser
+                return $ foldl1 Par (map (`Move` pos) ids))
