@@ -1,6 +1,5 @@
 module SalsaParser where
 
-import Control.Monad ( MonadPlus(..), liftM )
 import Control.Applicative ( Applicative(..), Alternative((<|>), empty, many) )
 import Data.Char
 
@@ -175,6 +174,14 @@ commandsParser = many1 commandParser
 type Error = String
 
 parseString :: String -> Either Error Program
-parseString iput = case parseEof commandsParser iput of
+parseString iput = let ret = do { cs <- commandsParser; _ <- spaces; return cs } in
+    case parseEof ret iput of
     [(prog, "")] -> return prog
     _ -> Left "Fail"  -- TODO: Better error message
+    where
+
+
+parseFile :: FilePath -> IO (Either Error Program)
+parseFile fp = do
+    str <- readFile fp
+    return $ parseString str

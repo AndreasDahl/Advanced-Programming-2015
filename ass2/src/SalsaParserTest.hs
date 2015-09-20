@@ -175,7 +175,13 @@ testInvalidParseString = TestCase $
     (Left "Fail") $
     parseString "Fail"
 
+testParseStringTrailingSpaces = TestCase $
+    assertEqual "for parseString \"toogle foo  \n\","
+    (Right [Toggle "foo"]) $
+    parseString "toggle foo  \n"
+
 tests = TestList [
+    testParseStringTrailingSpaces,
     testSimpleParseString,
     testInvalidParseString,
     testMultipleCommands,
