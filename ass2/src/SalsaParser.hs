@@ -15,11 +15,12 @@ Program    ::= Commands
 Commands   ::= Command
              | Command Commands
 
-Command    ::= Idents '->' Pos
+Command    ::= CommandOpt
+             | CommandOpt '||' Command
+CommandOpt ::= Idents '->' Pos
              | 'toggle' Ident
              | ShapeDef
              | 'hidden' ShapeDef
-             | Command '||' Command
 
 ShapeDef   ::= 'rectangle' Ident Expr Expr Expr Expr Colour
              | 'circle' Ident Expr Expr Expr Colour
@@ -31,10 +32,12 @@ Pos        ::= '('Expr',' Expr ')'
              | '+' '('Expr',' Expr ')'
 
 Expr       ::= Prim
-             | Expr '*' Prim
-             | Expr '/' Prim
-             | Expr '+' Prim
-             | Expr '-' Prim
+             | Prim MulOp
+             | Prim AddOp
+MulOp      ::= '*' Expr
+             | '/' Expr
+AddOp      ::= '+' Expr
+             | '-' Expr
 Prim       ::= integer
              | Ident '.' 'x'
              | Ident '.' 'y'
@@ -42,24 +45,6 @@ Prim       ::= integer
 Colour     ::= 'blue' | 'plum' | 'red' | 'green' | 'orange'
 
 ------------}
-
-{-
-
-ExprE      ::= ExprT ExprEopt
-ExprEopt   ::= '+' ExprT ExprEopt
-             | '-' ExprT ExprEopt
-             | None
-ExprT      ::= Prim ExprTopt
-ExprTopt   ::= '*' Prim ExprTopt
-             | '/' Prim ExprTopt
-             | None
-Prim       ::= integer
-             | Ident '.' 'x'
-             | Ident '.' 'y'
-             | '(' Expr ')'
-
--}
-
 
 integerParser :: Parser Integer
 integerParser = do
