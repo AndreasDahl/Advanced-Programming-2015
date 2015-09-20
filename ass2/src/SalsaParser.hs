@@ -150,9 +150,6 @@ shapeDefParser hidden = rectParser <|> circleParser
             c <- colourParser
             return $ Circ i x y r c hidden
 
-m1 = Move "hest" (Abs (Const 1) (Const 2))
-m2 = Move "ko" (Abs (Const 1) (Const 2))
-
 commandParser :: Parser Command
 commandParser = commandOpt <|> do
     c1 <- commandOpt
@@ -160,7 +157,6 @@ commandParser = commandOpt <|> do
     c2 <- commandParser
     return $ Par c1 c2
     where
-        parOp = do{ _ <- symbol "||"; return Par }
         commandOpt :: Parser Command
         commandOpt = (do
                 _ <- symbol "toggle" >> space
@@ -172,3 +168,13 @@ commandParser = commandOpt <|> do
                 _   <- symbol "->"
                 pos <- posParser
                 return $ foldl1 Par (map (`Move` pos) ids))
+
+commandsParser :: Parser [Command]
+commandsParser = many1 commandParser
+
+type Error = String
+
+parseString :: String -> Either Error Program
+parseString iput = case parseEof commandsParser iput of
+    [(prog, "")] -> return prog
+    _ -> Left "Fail"  -- TODO: Better error message

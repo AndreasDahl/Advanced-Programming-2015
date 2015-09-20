@@ -158,7 +158,27 @@ testMoveMultipleCommand = TestCase $
     [(Par (Move "foo" (Abs (Const 1) (Const 2))) (Move "bar" (Abs (Const 1) (Const 2))), "")] $
     parseEof commandParser "foo bar -> (1,2)"
 
+-- commandsParser
+testMultipleCommands = TestCase $
+    assertEqual "for commandsParser \"toggle foo toggle bar\","
+    [([Toggle "foo", Toggle "bar"], "")] $
+    parseEof commandsParser "toggle foo toggle bar"
+
+-- parseString
+testSimpleParseString = TestCase $
+    assertEqual "for parseString \"toggle foo\","
+    (Right [Toggle "foo"]) $
+    parseString "toggle foo"
+
+testInvalidParseString = TestCase $
+    assertEqual "for parseString \"toogle foo\","
+    (Left "Fail") $
+    parseString "Fail"
+
 tests = TestList [
+    testSimpleParseString,
+    testInvalidParseString,
+    testMultipleCommands,
     testHiddenShapeCommand,
     testHiddenShapeNoSpace,
     testToggleCommand,
