@@ -1,5 +1,7 @@
 module SalsaInterp where
 
+import Control.Applicative ( Applicative(..) )
+
 import           Data.List
 import           Gpx
 import           SalsaAst
@@ -177,14 +179,17 @@ command (Toggle needle) = Salsa $ \ (Con n shapes) ->
 command (Move i p) = Salsa $ \ con -> do
         (newCon, animation)<- move con i p
         return ((), newCon, animation)
---TODO: command (Par) p = undefined
-command _ = undefined
+command (Par c1 c2) = Salsa $ \ con -> do
+        (_, c1', _) <- runSalsa (command c1) con
+        r <- runSalsa (command c2) c1'
+        return r
 
 prog :: Program
-prog = [
-    Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True,
-    Circ "john" (Const 100) (Const 100) (Const 50) Red True,
-    Move "jens" (Abs (Const 200) (Const 200))]
+prog = [ 
+    (Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True),
+    Par (Circ "john" (Const 100) (Const 100) (Const 50) Red True)
+    (Move "jens" (Abs (Const 200) (Const 200)))
+    ]
 
 runProg :: Integer -> Program -> Either String Animation
 runProg n = fn (Con n [])
