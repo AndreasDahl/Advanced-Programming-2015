@@ -164,6 +164,11 @@ testMultipleCommands = TestCase $
     [([Toggle "foo", Toggle "bar"], "")] $
     parseEof commandsParser "toggle foo toggle bar"
 
+testMultipleCommandsNoSpace = TestCase $
+    assertEqual "for commandsParser \"rectangle foo 1 2 3 4 greenfoo -> (5,6)\","
+    [] $
+    parseEof commandsParser "rectangle foo 1 2 3 4 greenfoo -> (5,6)"
+
 -- parseString
 testSimpleParseString = TestCase $
     assertEqual "for parseString \"toggle foo\","
@@ -180,7 +185,9 @@ testParseStringTrailingSpaces = TestCase $
     (Right [Toggle "foo"]) $
     parseString "toggle foo  \n"
 
+
 tests = TestList [
+    testMultipleCommandsNoSpace,
     testParseStringTrailingSpaces,
     testSimpleParseString,
     testInvalidParseString,

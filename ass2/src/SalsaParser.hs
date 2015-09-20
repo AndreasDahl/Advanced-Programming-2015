@@ -154,7 +154,7 @@ commandParser = commandOpt <|> do
                 return $ foldl1 Par (map (`Move` pos) ids))
 
 commandsParser :: Parser [Command]
-commandsParser = many1 commandParser
+commandsParser = commandParser `sepBy1` space
 
 type Error = String
 
