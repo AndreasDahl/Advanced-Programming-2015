@@ -9,21 +9,14 @@ import           SalsaAst
 type Position = (Integer, Integer)
 
 interpolate :: Integer -> Position -> Position -> [Position]
-interpolate n (pStartX, pStartY) (pEndX, pEndY)
-    = iteration n
-        ((pEndX - pStartX) `quot` n)
-        ((pEndY - pStartY) `quot` n)
-        (pStartX, pStartY)
+interpolate i (ax, ay) (bx, by) = next (i-1) [(bx, by)]
     where
-        iteration 0 _ _ _ = []
-        iteration steps xStep yStep (xPrev, yPrev)
-            = let next = (xPrev + xStep, yPrev + yStep) in
-                next
-                : iteration
-                    (steps - 1)
-                    xStep
-                    yStep
-                    next
+        dx = (bx - ax) `quot` i
+        dy = (by - ay) `quot` i
+        next :: Integer -> [Position] -> [Position]
+        next 0 ps = ps
+        next n s@((px,py):_) = next (n-1) ((px-dx, py-dy):s)
+        next _ [] = [] -- can't happen
 
 data Shape = Rectangle Position (Integer, Integer) Colour Bool
            | Circle Position Integer Colour Bool
@@ -185,7 +178,7 @@ command (Par c1 c2) = Salsa $ \ con -> do
         return r
 
 prog :: Program
-prog = [ 
+prog = [
     (Rect "jens" (Const 0) (Const 100) (Const 100) (Const 100) Blue True),
     Par (Circ "john" (Const 100) (Const 100) (Const 50) Red True)
     (Move "jens" (Abs (Const 200) (Const 200)))
