@@ -23,6 +23,7 @@ data Shape = Rectangle Position (Integer, Integer) Colour Bool
     deriving(Show, Eq)
 
 data Context = Con Integer [(Ident, Shape)]
+    deriving(Eq, Show)
 
 newtype Salsa a =
     Salsa { runSalsa :: Context -> Either String (a, Context, Animation) }
