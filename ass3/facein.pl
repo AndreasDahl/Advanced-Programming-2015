@@ -6,8 +6,8 @@ facein([person(andrzej, [susan, ken]),
  person(tony, []),
  person(jen, [susan, jessica, tony])]).
 
-member(P, [P | _]).
-member(P, [_ | Tail]) :- member(P, Tail).
+mymember(P, [P | _]).
+mymember(P, [_ | Tail]) :- mymember(P, Tail).
 
 friend([person(P1, Friends) | _], P1, P2) :- member(P2, Friends).
 friend([_ | Tail], P1, P2) :- friend(Tail, P1, P2).
