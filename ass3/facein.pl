@@ -35,3 +35,10 @@ containsAll([Head | Tail], List) :-
 addUnique(X, [], [X]).
 addUnique(X, [X | Tail], [X | Tail]).
 addUnique(X, [Head | Tail], [Head | Y]) :- addUnique(X, Tail, Y).
+
+addUniques([], X, X).
+addUniques([A | X], List, Ret) :-
+    addUnique(A, List, ListAdded),
+    addUniques(X, ListAdded, Ret).
+
+%createChain(G, List, person()) :- 
