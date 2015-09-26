@@ -44,10 +44,16 @@ test_addUnique :-
     addUnique(a, [a, b, c], [a, b, c]),
     addUnique(a, [], [a]).
 
+test_addUniques :-
+    addUniques([], [a], [a]),
+    addUniques([a,b], [c,d], X), containsAll([a,b,c,d], X),
+    addUniques([a,b,c], [a,b], [a,b,c]).
+
 test_all :- test_mymember,
             test_friend,
             test_goodfriends,
             test_clique,
             test_listAll,
             test_containsAll,
-            test_addUnique.
+            test_addUnique,
+            test_addUniques.
