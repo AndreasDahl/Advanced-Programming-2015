@@ -1,11 +1,3 @@
-facein([person(andrzej, [susan, ken]),
- person(ken, [andrzej, susan]),
- person(susan, [reed, jessica, jen, andrzej, ken]),
- person(reed, [tony, jessica]),
- person(jessica, [jen]),
- person(tony, []),
- person(jen, [susan, jessica, tony])]).
-
 mymember(P, [P | _]).
 mymember(P, [_ | Tail]) :- mymember(P, Tail).
 

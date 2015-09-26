@@ -1,6 +1,23 @@
 :- consult(facein).
 
-% Tests
+facein([person(andrzej, [susan, ken]),
+ person(ken, [andrzej, susan]),
+ person(susan, [reed, jessica, jen, andrzej, ken]),
+ person(reed, [tony, jessica]),
+ person(jessica, [jen]),
+ person(tony, []),
+ person(jen, [susan, jessica, tony])]).
+
+test_mymember :-
+    mymember(a, [a]),
+    mymember(d, [a,b,c,d,e]),
+    not(mymember(a, [b,c,d])).
+
+test_friend :-
+    facein(G),
+    friend(G, reed, tony),
+    not(friend(G, tony, reed)).
+
 test_goodfriends :-
     facein(G),
     goodfriends(G, ken, andrzej),
@@ -22,7 +39,15 @@ test_containsAll :-
     containsAll([ken, susan, reed], L),
     containsAll([andrzej, ken, susan, reed, jessica, tony, jen], L).
 
-test_all :- test_goodfriends,
+test_addUnique :-
+    addUnique(a, [b, c], [b, c, a]),
+    addUnique(a, [a, b, c], [a, b, c]),
+    addUnique(a, [], [a]).
+
+test_all :- test_mymember,
+            test_friend,
+            test_goodfriends,
             test_clique,
             test_listAll,
-            test_containsAll.
+            test_containsAll,
+            test_addUnique.
