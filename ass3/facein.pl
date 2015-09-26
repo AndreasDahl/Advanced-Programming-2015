@@ -1,6 +1,6 @@
 facein([person(andrzej, [susan, ken]),
- person(ken, [andrzej]),
- person(susan, [reed, jessica, jen, andrzej]),
+ person(ken, [andrzej, susan]),
+ person(susan, [reed, jessica, jen, andrzej, ken]),
  person(reed, [tony, jessica]),
  person(jessica, [jen]),
  person(tony, []),
@@ -9,7 +9,35 @@ facein([person(andrzej, [susan, ken]),
 mymember(P, [P | _]).
 mymember(P, [_ | Tail]) :- mymember(P, Tail).
 
-friend([person(P1, Friends) | _], P1, P2) :- member(P2, Friends).
+friend([person(P1, Friends) | _], P1, P2) :- mymember(P2, Friends).
 friend([_ | Tail], P1, P2) :- friend(Tail, P1, P2).
 
 goodfriends(G, P1, P2) :- friend(G, P1, P2), friend(G, P2, P1).
+
+
+
+% group G, person A, person-list B
+% A is goodfriends with everyone in B
+cliqueHelper(_, _, []).
+cliqueHelper(G, A, [B | X]) :- goodfriends(G, A, B), cliqueHelper(G, A, X).
+
+clique(_, []).
+clique(G, [P | L]) :- cliqueHelper(G, P, L), clique(G, L).
+
+
+
+
+
+
+% Tests
+test1 :-
+    facein(G),
+    goodfriends(G, ken, andrzej),
+    goodfriends(G, andrzej, ken).
+
+test2 :-
+    facein(G),
+    clique(G, [jessica, jen]),
+    clique(G, [andrzej, susan, ken]).
+
+test_all :- test1, test2.
