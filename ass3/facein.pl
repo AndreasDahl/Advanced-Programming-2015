@@ -23,3 +23,6 @@ cliqueHelper(G, A, [B | X]) :- goodfriends(G, A, B), cliqueHelper(G, A, X).
 
 clique(_, []).
 clique(G, [P | L]) :- cliqueHelper(G, P, L), clique(G, L).
+
+listAll([], []).
+listAll([person(Head, _)| Tail], [Head | X]) :- listAll(Tail, X).
