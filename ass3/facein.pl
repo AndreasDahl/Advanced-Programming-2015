@@ -24,5 +24,11 @@ cliqueHelper(G, A, [B | X]) :- goodfriends(G, A, B), cliqueHelper(G, A, X).
 clique(_, []).
 clique(G, [P | L]) :- cliqueHelper(G, P, L), clique(G, L).
 
+% wannabe
 listAll([], []).
 listAll([person(Head, _)| Tail], [Head | X]) :- listAll(Tail, X).
+
+compareLists([], _).
+compareLists([Head | Tail], List) :-
+    mymember(Head, List), compareLists(Tail, List).
+
