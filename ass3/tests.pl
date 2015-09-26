@@ -16,6 +16,13 @@ test_listAll :-
     facein(G),
     listAll(G, [andrzej, ken, susan, reed, jessica, tony, jen]).
 
+test_containsAll :-
+    facein(G),
+    listAll(G, L),
+    containsAll([ken, susan, reed], L),
+    containsAll([andrzej, ken, susan, reed, jessica, tony, jen], L).
+
 test_all :- test_goodfriends,
             test_clique,
-            test_listAll.
+            test_listAll,
+            test_containsAll.

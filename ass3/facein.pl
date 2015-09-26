@@ -28,7 +28,6 @@ clique(G, [P | L]) :- cliqueHelper(G, P, L), clique(G, L).
 listAll([], []).
 listAll([person(Head, _)| Tail], [Head | X]) :- listAll(Tail, X).
 
-compareLists([], _).
-compareLists([Head | Tail], List) :-
-    mymember(Head, List), compareLists(Tail, List).
-
+containsAll([], _).
+containsAll([Head | Tail], List) :-
+    mymember(Head, List), containsAll(Tail, List).
