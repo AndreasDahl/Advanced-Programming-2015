@@ -12,4 +12,10 @@ test_clique :-
     clique(G, [andrzej, susan, ken]),
     not(clique(G, [jessica, jen, susan])).
 
-test_all :- test_goodfriends, test_clique.
+test_listAll :-
+    facein(G),
+    listAll(G, [andrzej, ken, susan, reed, jessica, tony, jen]).
+
+test_all :- test_goodfriends,
+            test_clique,
+            test_listAll.
