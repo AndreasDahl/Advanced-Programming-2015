@@ -22,7 +22,13 @@ test_containsAll :-
     containsAll([ken, susan, reed], L),
     containsAll([andrzej, ken, susan, reed, jessica, tony, jen], L).
 
+test_addUnique :-
+    addUnique(a, [b, c], [b, c, a]),
+    addUnique(a, [a, b, c], [a, b, c]),
+    addUnique(a, [], [a]).
+
 test_all :- test_goodfriends,
             test_clique,
             test_listAll,
-            test_containsAll.
+            test_containsAll,
+            test_addUnique.
