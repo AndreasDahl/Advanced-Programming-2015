@@ -31,3 +31,6 @@ listAll([person(Head, _)| Tail], [Head | X]) :- listAll(Tail, X).
 containsAll([], _).
 containsAll([Head | Tail], List) :-
     mymember(Head, List), containsAll(Tail, List).
+
+addUnique(X, [X | _]).
+addUnique(X, [Head | Tail]) :- addUnique(X, Tail).
