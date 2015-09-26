@@ -1,14 +1,15 @@
 :- consult(facein).
 
 % Tests
-test1 :-
+test_goodfriends :-
     facein(G),
     goodfriends(G, ken, andrzej),
     goodfriends(G, andrzej, ken).
 
-test2 :-
+test_clique :-
     facein(G),
     clique(G, [jessica, jen]),
-    clique(G, [andrzej, susan, ken]).
+    clique(G, [andrzej, susan, ken]),
+    not(clique(G, [jessica, jen, susan])).
 
-test_all :- test1, test2.
+test_all :- test_goodfriends, test_clique.
