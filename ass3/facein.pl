@@ -36,11 +36,20 @@ addUniques([A | X], List, Ret) :-
     addUnique(A, List, ListAdded),
     addUniques(X, ListAdded, Ret).
 
+myAppend([], X, X).
+myAppend([Head | Tail], X, Y) :-
+    myAppend(Tail, [Head | X], Y).
+
+mySelect(_, [], []).
+mySelect(Elem, [Head | Tail], Ret) :-
+    mySelect(Elem, Tail, SubRes),
+    (Elem = Head -> Ret = SubRes ; Ret = [Head | SubRes]).
+
 wannabeAll([], _).
 wannabeAll(G, [Head | Tail]) :-
-    select(person(Head, Friends), G, G2),
-    append(Friends, Tail, Todo),
-    wannabeAll(G2, Todo)
+    mySelect(person(Head, Friends), G, G2),
+    myAppend(Friends, Tail, Todo),
+    wannabeAll(G2, Todo).
 wannabeAll(G, [_ | Tail]) :-
     wannabeAll(G, Tail).
 
