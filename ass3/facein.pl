@@ -56,13 +56,21 @@ wannabeAll(G, [_ | Tail]) :-
 wannabe(G, X) :-
     wannabeAll(G, [X]).
 
+%idol
 anyPath(_, [To | _], To).
 anyPath(G, [Head | Tail], To) :-
-    mySelect(person(Head, Friends), G, G2),
-    myAppend(Friends, Tail, Todo),
+    select(person(Head, Friends), G, G2),
+    append(Friends, Tail, Todo),
     anyPath(G2, Todo, To).
 anyPath(G, [_ | Tail], To) :-
     anyPath(G, Tail, To).
 
-path(G, From, To) :-
-    anyPath(G, [From], To).
+idolHelper(_, [], _).
+idolHelper(G, [P|Rest], X) :-
+    anyPath(G, [P], X),
+    idolHelper(G, Rest, X).
+
+idol(G, X) :-
+    listAll(G, L),
+    idolHelper(G, L, X).
+
