@@ -36,8 +36,13 @@ addUniques([A | X], List, Ret) :-
     addUnique(A, List, ListAdded),
     addUniques(X, ListAdded, Ret).
 
-createChain(_, [], _).
-createChain(G, [Head | Tail], Ret) :-
-    friendsOf(G, Head, X),
-    addUniques(X, Tail, L),
-    addUnique(Head, L, Ret).
+wannabeAll([], _).
+wannabeAll(G, [Head | Tail]) :-
+    select(person(Head, Friends), G, G2),
+    append(Friends, Tail, Todo),
+    wannabeAll(G2, Todo)
+wannabeAll(G, [_ | Tail]) :-
+    wannabeAll(G, Tail).
+
+wannabe(G, X) :-
+    wannabeAll(G, [X]).
