@@ -55,3 +55,14 @@ wannabeAll(G, [_ | Tail]) :-
 
 wannabe(G, X) :-
     wannabeAll(G, [X]).
+
+anyPath(_, [To | _], To).
+anyPath(G, [Head | Tail], To) :-
+    mySelect(person(Head, Friends), G, G2),
+    myAppend(Friends, Tail, Todo),
+    anyPath(G2, Todo, To).
+anyPath(G, [_ | Tail], To) :-
+    anyPath(G, Tail, To).
+
+path(G, From, To) :-
+    anyPath(G, [From], To).
