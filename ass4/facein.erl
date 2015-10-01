@@ -1,4 +1,5 @@
-start() -> spawn(fun loop/0).
+-module(facein).
+-export([start/0, add/2, list_all/1, update/2]).
 
 start() -> spawn(fun() -> loop(dict:new()) end).
 
@@ -10,6 +11,9 @@ list_all(Pid) ->
 
 update(Pid, Contact) ->
     blocking(Pid, {update, Contact}).
+
+
+% Internals
 
 blocking(Pid, Request) ->
     Pid ! {self(), Request},
@@ -41,4 +45,4 @@ loop(Contacts) ->
         {From, Other} ->
             From ! {self(), {error,unknow_request, Other}},
             loop(Contacts)
-    end
+    end.
