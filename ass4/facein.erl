@@ -1,13 +1,20 @@
 -module(facein).
--export([start/1, add_friend/2]).
+-export([start/1, add_friend/2, friends/1, test/0]).
 
 
 start(Name) ->
-    Pid = spawn(fun() -> loop(Name) end),
+    Pid = spawn(fun() -> loop(Name, []) end),
     {ok, Pid}.
 
 add_friend(Pid, Fid) ->
-    {error, not_yet_implemented}.
+    blocking(Pid, {add_friend, Fid}).
+
+friends(Pid) ->
+    blocking(Pid, {friends}).
+
+test() ->
+    {ok, P} = start(muf),
+    add_friend(P, dahl).
 
 % Private
 
@@ -17,11 +24,21 @@ blocking(Pid, Request) ->
         {Pid, Response} -> Response
     end.
 
-loop(Name) ->
+loop(Name, Friends) ->
     receive
+        {From, {get_name}} ->
+            From ! {self(), {name, Name}},
+            loop(Name, Friends);
+        {From, {friends}} ->
+            From ! {self(), Friends},
+            loop(Name, Friends);
+        {From, {add_friend, Fid}} ->
+            {name, FName} = blocking(Fid, {get_name}),
+            From ! {self(), ok},
+            loop(Name, [FName | Friends]);
         Else ->
             io:format("Message not handled!: ~p~n", Else),
-            loop(Name)
+            loop(Name, Friends)
     end.
 
 % -export([start/0, add/2, list_all/1, update/2]).
