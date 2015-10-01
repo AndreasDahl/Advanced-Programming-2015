@@ -2,7 +2,9 @@
 -export([start/1]).
 
 
-start(Name) -> spawn(fun() -> loop(Name) end).
+start(Name) ->
+    Pid = spawn(fun() -> loop(Name) end),
+    {ok, Pid}.
 
 % Private
 
