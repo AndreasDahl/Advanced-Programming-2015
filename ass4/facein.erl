@@ -1,6 +1,15 @@
 -module(facein).
+-export([start/1]).
 
 
+start(Name) -> spawn(fun() -> loop(Name) end).
+
+% Private
+
+loop(Name) ->
+    receive
+        _ -> loop(Name)
+end.
 
 % -export([start/0, add/2, list_all/1, update/2]).
 %
