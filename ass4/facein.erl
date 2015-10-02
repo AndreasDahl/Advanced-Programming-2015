@@ -1,9 +1,9 @@
 -module(facein).
--export([start/1, add_friend/2, friends/1, test/0]).
+-export([start/1, add_friend/2, friends/1, test/0, broadcast/3]).
 
 
 start(Name) ->
-    Pid = spawn(fun() -> loop(Name, []) end),
+    Pid = spawn(fun() -> loop(Name, [], []) end),
     {ok, Pid}.
 
 add_friend(Pid, Fid) ->
@@ -12,11 +12,24 @@ add_friend(Pid, Fid) ->
 friends(Pid) ->
     blocking(Pid, {friends}).
 
+broadcast(Pid, Msg, Radius) ->
+    io:format("Broadcast: ~p~n", [Pid]),
+    Pid ! {broadcast, Msg, Radius},
+    ok.
+
 test() ->
-    {ok, P} = start(muf),
-    add_friend(P, dahl).
+    {ok, P1} = start(muf),
+    {ok, P2} = start(dahl),
+    add_friend(P1, P2),
+    add_friend(P2, P1),
+    broadcast(P1, "hej", 1).
 
 % Private
+
+broadcast_all([], _, _) -> ok;
+broadcast_all([{Pid, _} | Friends], Msg, Radius) ->
+    broadcast(Pid, Msg, Radius),
+    broadcast_all(Friends, Msg, Radius).
 
 blocking(Pid, Request) ->
     Pid ! {self(), Request},
@@ -24,21 +37,26 @@ blocking(Pid, Request) ->
         {Pid, Response} -> Response
     end.
 
-loop(Name, Friends) ->
+loop(Name, Friends, Messages) ->
     receive
         {From, {get_name}} ->
             From ! {self(), {name, Name}},
-            loop(Name, Friends);
+            loop(Name, Friends, Messages);
         {From, {friends}} ->
             From ! {self(), Friends},
-            loop(Name, Friends);
+            loop(Name, Friends, Messages);
         {From, {add_friend, Fid}} ->
             {name, FName} = blocking(Fid, {get_name}),
             From ! {self(), ok},
-            loop(Name, [FName | Friends]);
+            loop(Name, [{Fid, FName} | Friends], Messages);
+        {broadcast, Msg, 0} ->
+            loop(Name, Friends, [Msg | Messages]);
+        {broadcast, Msg, Radius} ->
+            broadcast_all(Friends, Msg, Radius-1),
+            loop(Name, Friends, [Msg | Messages]);
         Else ->
             io:format("Message not handled!: ~p~n", Else),
-            loop(Name, Friends)
+            loop(Name, Friends, Messages)
     end.
 
 % -export([start/0, add/2, list_all/1, update/2]).
