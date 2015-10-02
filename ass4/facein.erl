@@ -17,6 +17,9 @@ broadcast(Pid, Msg, Radius) ->
     Pid ! {broadcast, Msg, Radius},
     ok.
 
+received_messages(Pid) ->
+    blocking(Pid, {received_messages}).
+
 test() ->
     {ok, P1} = start(muf),
     {ok, P2} = start(dahl),
@@ -54,6 +57,9 @@ loop(Name, Friends, Messages) ->
         {broadcast, Msg, Radius} ->
             broadcast_all(Friends, Msg, Radius-1),
             loop(Name, Friends, [Msg | Messages]);
+        {From, {received_messages}} ->
+            From ! {self(), Messages},
+            loop(Name, Friends, Messages);
         Else ->
             io:format("Message not handled!: ~p~n", Else),
             loop(Name, Friends, Messages)
