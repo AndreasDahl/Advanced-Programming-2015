@@ -42,8 +42,8 @@ extract(N, List) ->
 
 loop(Name, Friends, Messages) ->
     receive
-        {From, {name, Name}} ->
-            loop(Name, [{Fid, Name} | Friends], Messages);
+        {From, {name, FName}} ->
+            loop(Name, [{From, FName} | Friends], Messages);
 
         {From, {get_name}} ->
             From ! {self(), {name, Name}},
@@ -56,7 +56,7 @@ loop(Name, Friends, Messages) ->
         {From, {add_friend, Fid}} ->
             Fid ! {self(), {get_name}},
             From ! {self(), ok},
-            loop(Name, [{Fid, FName} | Friends], Messages);
+            loop(Name, Friends, Messages);
 
         {broadcast, Msg, Radius} ->
             case member(Msg, Messages) of
@@ -72,6 +72,6 @@ loop(Name, Friends, Messages) ->
             loop(Name, Friends, Messages);
 
         Else ->
-            io:format("Message not handled!: ~p~n", Else),
+            io:format("Message not handled!: ~p~n", [Else]),
             loop(Name, Friends, Messages)
     end.
