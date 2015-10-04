@@ -1,5 +1,5 @@
 -module(facein_test).
--export([test/0]).
+-export([test/0, test_error/0]).
 
 -import(facein,[start/1, add_friend/2, friends/1, broadcast/3, received_messages/1]).
 -import(timer,[sleep/1]).
@@ -37,3 +37,9 @@ test() ->
     R6 = received_messages(Pken),
     R7 = received_messages(Pjessica),
     [R1, R2, R3, R4, R5, R6, R7].
+
+test_error() ->
+    {ok, Pken} = start(ken),
+    {ok, Pandrzej} = start(andrzej),
+    add_friend(Pken, Pandrzej),
+    add_friend(Pken, Pandrzej).
