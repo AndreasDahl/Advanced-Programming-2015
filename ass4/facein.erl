@@ -42,6 +42,9 @@ extract(N, List) ->
 
 loop(Name, Friends, Messages) ->
     receive
+        {From, {name, Name}} ->
+            loop(Name, [{Fid, Name} | Friends], Messages);
+
         {From, {get_name}} ->
             From ! {self(), {name, Name}},
             loop(Name, Friends, Messages);
@@ -51,7 +54,7 @@ loop(Name, Friends, Messages) ->
             loop(Name, Friends, Messages);
 
         {From, {add_friend, Fid}} ->
-            {name, FName} = blocking(Fid, {get_name}),
+            Fid ! {self(), {get_name}},
             From ! {self(), ok},
             loop(Name, [{Fid, FName} | Friends], Messages);
 
