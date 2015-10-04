@@ -1,5 +1,5 @@
 -module(facein).
--export([start/1, add_friend/2, friends/1, test/0, broadcast/3, received_messages/1]).
+-export([start/1, add_friend/2, friends/1, broadcast/3, received_messages/1]).
 
 -import(lists,[map/2, member/2]).
 
@@ -19,21 +19,13 @@ broadcast(Pid, Msg, Radius) ->
 received_messages(Pid) ->
     blocking(Pid, {received_messages}).
 
-test() ->
-    {ok, P1} = start(muf),
-    {ok, P2} = start(dahl),
-    add_friend(P1, P2),
-    add_friend(P2, P1),
-    broadcast(P1, "hej", 5),
-    P1.
-
 % Private
 
 broadcast_private(Pid, Msg, Radius) ->
     Pid ! {broadcast, Msg, Radius},
     ok.
 
-broadcast_all(_, _, 0) -> ok;
+broadcast_all(_, _, -1) -> ok;
 broadcast_all([], _, _) -> ok;
 broadcast_all([{Pid, _} | Friends], Msg, Radius) ->
     broadcast_private(Pid, Msg, Radius),
