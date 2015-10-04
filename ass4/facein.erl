@@ -1,7 +1,7 @@
 -module(facein).
 -export([start/1, add_friend/2, friends/1, broadcast/3, received_messages/1]).
 
--import(lists,[map/2, member/2]).
+-import(lists,[map/2, member/2, keymember/3]).
 
 start(Name) ->
     Pid = spawn(fun() -> loop(Name, [], []) end),
@@ -54,8 +54,13 @@ loop(Name, Friends, Messages) ->
             loop(Name, Friends, Messages);
 
         {From, {add_friend, Fid}} ->
-            Fid ! {self(), {get_name}},
-            From ! {self(), ok},
+            case keymember(Fid, 1, Friends) of
+                true  ->
+                    From ! {self(), {error, already_friend}};
+                false ->
+                    Fid ! {self(), {get_name}},
+                    From ! {self(), ok}
+            end,
             loop(Name, Friends, Messages);
 
         {broadcast, Msg, Radius} ->
