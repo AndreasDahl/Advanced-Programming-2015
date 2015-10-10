@@ -4,9 +4,7 @@
 
 -export([start/0]).
 
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
--endif.
+
 
 %% API
 
@@ -26,13 +24,6 @@ start() ->
 
 
 
-%% Unit Tests.
 
--ifdef(TEST).
-
-simple_test() ->
-    ?assert(ok == start()).
-
--endif.
 
 %% End of Module.
