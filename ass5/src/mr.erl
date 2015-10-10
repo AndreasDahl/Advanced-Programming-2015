@@ -1,17 +1,38 @@
 -module(mr).
--export([start/0, job/6, stop/1, advanced_job/6]).
+
+%% mr: mr library's entry point.
+
+-export([start/0]).
+
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
+
+%% API
 
 start() ->
-    end.
+    ok.
 
-job(Pid, NumWork, MapFun, RedFun, Initial, Data) ->
-    end.
+% job(Pid, NumWork, MapFun, RedFun, Initial, Data) ->
+%     end.
+%
+% stop(Pid) ->
+%     end.
+%
+% advanced_job(Pid, NumWork, MapFun, RedFun, Initial, Data) ->
+%     end.
 
-stop(Pid) ->
-    end.
+%% Internals
 
-advanced_job(Pid, NumWork, MapFun, RedFun, Initial, Data) ->
-    end.
 
-% Private functions
 
+%% Unit Tests.
+
+-ifdef(TEST).
+
+simple_test() ->
+    ?assert(ok == start()).
+
+-endif.
+
+%% End of Module.

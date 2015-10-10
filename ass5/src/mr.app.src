@@ -1,0 +1,14 @@
+{application, mr,
+ [
+  {description, "An Erlang mr library"},
+  {vsn, "1"},
+  {modules, [
+             mr
+            ]},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
