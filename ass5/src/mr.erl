@@ -12,6 +12,7 @@ start() ->
 
 job(Pid, NumWork, MapFun, RedFun, Initial, Data) ->
     gen_fsm:send_event(Pid, {job, NumWork, MapFun, RedFun, Initial, Data}).
+    % return {ok, Result} if it succeeds.
 
 stop(Pid) ->
     gen_fsm:stop(Pid).
