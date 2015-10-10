@@ -4,8 +4,13 @@
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 
-simple_test() ->
+start_return_test() ->
     {ok, Pid} = mr:start(),
-    mr:job(Pid).
+    mr:stop(Pid).
+
+simple_job_test() ->
+    {ok, Master} = mr:start(),
+    mr:job(Master),
+    mr:stop(Master).
 
 -endif.
