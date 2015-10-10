@@ -10,7 +10,8 @@ start_return_test() ->
 
 simple_job_test() ->
     {ok, Master} = mr:start(),
-    mr:job(Master),
-    mr:stop(Master).
+    mr:job(Master, 1, fun plus1/1, fun plus1/1, initial, 2).
+
+plus1(A) -> A + 1.
 
 -endif.
